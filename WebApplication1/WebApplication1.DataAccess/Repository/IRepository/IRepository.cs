@@ -10,8 +10,13 @@ namespace WebApplication1.DataAccess.Repository.IRepository
         void Remove(T entity);
         void RemoveRange(IEnumerable<T> entity);
 
-        Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null, string? includeProperties = null, bool tracked = false);
-        Task<T> GetAsync(Expression<Func<T, bool>> filter, string? includeProperties = null, bool tracked = false);
+        Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null, 
+            string? searchText = null, 
+            int? skipAmount = null, int? pageSize = null,
+            string? ordering = null,
+            string? includeProperties = null, 
+            bool tracked = false);
+        Task<T> GetAsync(Expression<Func<T, bool>> filter, string? searchText = null, int? skipAmount = null, int? pageSize = null, string? includeProperties = null, bool tracked = false);
         void AddAsync(T entity);
     }
 }

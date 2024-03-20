@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace WebApplication1.Models
@@ -17,5 +18,7 @@ namespace WebApplication1.Models
         [ValidateNever]
         [ForeignKey(nameof(ThemeId))]
         public Theme Theme { get; set; }
+        [NotMapped]
+        public IEnumerable<Item> Items { get; set; }
     }
 }

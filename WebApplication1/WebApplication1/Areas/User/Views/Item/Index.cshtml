@@ -1,0 +1,35 @@
+﻿@using WebApplication1.DataAccess.Repository
+@model Item
+
+<a asp-controller="Collection" asp-action="Index" asp-route-collectionId="@Model.CollectionId" class="btn btn-outline-primary form-control" style="width:200px">
+    <i class="bi bi-arrow-return-left"></i> Back to Collection
+</a>
+
+<form method="post" class="row">
+    <input asp-for="Id" hidden />
+    <div class="col-12 p-3">
+        <div class="col-12 col-lg-6 form-outline mb-3">
+            <label asp-for="Name" class="ms-2 text-muted"></label>
+            <input asp-for="Name" class="form-control" disabled/>
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+        <label asp-for="Tags" class="ms-2 text-muted"></label>
+        <div class="d-flex flex-wrap">
+            @foreach (var tag in Model.Tags)
+            {
+                <div class="col-4 col-lg-3 col-xl-2 form-outline mb-3 pe-2">
+                    <div class="input-group">
+                        <input asp-for="@tag.Name" class="form-control" disabled/>
+                        <a class="btn btn-danger">
+                            <i class="bi bi-x-lg"></i>
+                        </a>
+                    </div>
+                    <span asp-validation-for="@tag.Name" class="text-danger"></span>
+                </div>
+            }
+        </div>
+        <button type="submit" class="btn btn-primary form-control" style="width:150px">
+            <i class="bi bi-pencil-square"></i> Edit
+        </button>
+    </div>
+</form>

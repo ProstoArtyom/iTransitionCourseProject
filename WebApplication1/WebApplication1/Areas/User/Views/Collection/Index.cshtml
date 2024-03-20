@@ -1,0 +1,81 @@
+﻿@model CollectionVM
+
+<form method="post" class="row">
+    <input asp-for="Collection.Id" hidden />
+    <div class="col-12 p-3">
+        <div class="col-12 col-lg-6 form-outline mb-3">
+            <label asp-for="Collection.Name" class="ms-2 text-muted"></label>
+            <input asp-for="Collection.Name" class="form-control" />
+            <span asp-validation-for="Collection.Name" class="text-danger"></span>
+        </div>
+        <div class="col-12 col-lg-8 form-outline mb-3">
+            <label asp-for="Collection.Description" class="ms-2 text-muted"></label>
+            <textarea asp-for="Collection.Description" class="form-control"></textarea>
+        </div>
+        <div class="col-12 col-lg-6 form-outline mb-3">
+            <label asp-for="Collection.ThemeId" class="ms-2 text-muted">Theme</label>
+            <select asp-for="Collection.ThemeId" asp-items="@Model.ThemesList" class="form-select">
+                <option disabled selected>--Select theme--</option>
+            </select>
+            <span asp-validation-for="Collection.ThemeId" class="text-danger"></span>
+        </div>
+        <button type="submit" class="btn btn-primary form-control" style="width:150px">
+            <i class="bi bi-floppy"></i> Change
+        </button>
+    </div>
+</form>
+
+<hr/>
+
+<div class="text-end mb-2">
+    <a class="btn btn-primary" style="width:150px" asp-action="">
+        <i class="bi bi-plus-circle"></i> Add Item
+    </a>
+    <a class="btn btn-danger" style="width:150px" asp-action="">
+        <i class="bi bi-trash3"></i> Delete Item
+    </a>
+</div>
+
+<div class="text-center">
+    <table id="tblCollection" class="table table-bordered table-striped table-hover" style="width:100%">
+        <thead>
+        <tr>
+            <th>№</th>
+            <th>Name</th>
+            <th>Tags</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in Model.Collection.Items)
+        {
+            <tr onclick="location.href = '@Url.Action("Index", "Item", new { itemId = item.Id })'">
+                <td>
+                    @item.Id
+                </td>
+                <td>
+                    @item.Name
+                </td>
+                <td>
+                    @($"{string.Join(", ", item.Tags.Take(3).Select(u => u.Name))}...")
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts{
+    <script>
+        tinymce.init({
+            selector: 'textarea',
+            plugins: 'anchor autolink charmap codesample emoticons  lists   table visualblocks wordcount',
+            toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough |  align lineheight | numlist bullist indent outdent',
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            $('#tblCollection').DataTable();
+        });
+    </script>
+    <partial name="_ValidationScriptsPartial"/>
+}

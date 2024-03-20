@@ -1,5 +1,7 @@
 ﻿using System.Linq.Expressions;
+using Korzh.EasyQuery.Linq;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Dynamic.Core;
 using WebApplication1.DataAccess.Data;
 using WebApplication1.DataAccess.Repository.IRepository;
 
@@ -72,13 +74,16 @@ namespace WebApplication1.DataAccess.Repository
             await dbSet.AddAsync(entity);
         }
 
-        public async Task<T> GetAsync(Expression<Func<T, bool>> filter, string? includeProperties = null, bool tracked = false)
+        public async Task<T> GetAsync(Expression<Func<T, bool>> filter, string? searchText = null, int? skipAmount = null, int? pageSize = null, string? includeProperties = null, bool tracked = false)
         {
             IQueryable<T> query;
             if (tracked) query = dbSet;
             else query = dbSet.AsNoTracking();
 
             query = query.Where(filter);
+
+            if (skipAmount != null) query = query.Skip(skipAmount.Value);
+            if (pageSize != null) query = query.Take(pageSize.Value);
 
             if (!string.IsNullOrEmpty(includeProperties))
             {
@@ -91,7 +96,12 @@ namespace WebApplication1.DataAccess.Repository
             return await query.FirstOrDefaultAsync();
         }
 
-        public async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>>? filter, string? includeProperties = null, bool tracked = false)
+        public async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>>? filter, 
+            string? searchText = null, 
+            int? skipAmount = null, int? pageSize = null, 
+            string? ordering = null, 
+            string? includeProperties = null, 
+            bool tracked = false)
         {
             IQueryable<T> query = dbSet;
             if (tracked) query = dbSet;
@@ -99,7 +109,14 @@ namespace WebApplication1.DataAccess.Repository
 
             if (filter != null) query = query.Where(filter);
 
-            if (!string.IsNullOrEmpty(includeProperties))
+            if (searchText != null) query = query.FullTextSearchQuery(searchText);
+
+            if (skipAmount != null) query = query.Skip(skipAmount.Value);
+            if (pageSize != null) query = query.Take(pageSize.Value);
+
+            if (!string.IsNullOrWhiteSpace(ordering)) query = query.OrderBy(ordering);
+
+            if (!string.IsNullOrWhiteSpace(includeProperties))
             {
                 foreach (var includeProp in includeProperties
                              .Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
@@ -107,6 +124,7 @@ namespace WebApplication1.DataAccess.Repository
                     query = query.Include(includeProp);
                 }
             }
+
             return await query.ToListAsync();
         }
     }
