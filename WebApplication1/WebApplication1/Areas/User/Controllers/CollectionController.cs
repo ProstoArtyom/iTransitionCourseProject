@@ -27,7 +27,14 @@ namespace WebApplication1.Areas.User.Controllers
             var collection = await _unitOfWork.Collection
                 .GetAsync(u => u.Id == collectionId, includeProperties: "Theme");
 
-            var items = await _unitOfWork.Item.GetAllAsync(x => x.CollectionId == collectionId, includeProperties: "Tags");
+            var items = await _unitOfWork.Item.GetAllAsync(x => x.CollectionId == collectionId);
+            foreach (var item in items)
+            {
+                var itemTags =
+                    await _unitOfWork.ItemTag.GetAllAsync(u => u.ItemId == item.Id, includeProperties: "Tag");
+                item.ItemTags = itemTags.ToList();
+            }
+
             collection.Items = items;
 
             var themes = await _unitOfWork.Theme.GetAllAsync();

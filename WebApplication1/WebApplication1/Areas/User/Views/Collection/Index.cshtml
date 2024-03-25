@@ -56,7 +56,7 @@
                     @item.Name
                 </td>
                 <td>
-                    @($"{string.Join(", ", item.Tags.Take(3).Select(u => u.Name))}...")
+                    @($"{string.Join(", ", item.ItemTags.Take(3).Select(u => u.Tag.Name))}...")
                 </td>
             </tr>
         }
