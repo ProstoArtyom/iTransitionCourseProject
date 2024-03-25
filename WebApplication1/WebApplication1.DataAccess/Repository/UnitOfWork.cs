@@ -10,6 +10,7 @@ namespace WebApplication1.DataAccess.Repository
         public IItemRepository Item { get; }
         public ITagRepository Tag { get; }
         public IThemeRepository Theme { get; }
+        public IItemTagRepository ItemTag { get; }
         public UnitOfWork(ApplicationDbContext db)
         {
             _db = db;
@@ -17,6 +18,7 @@ namespace WebApplication1.DataAccess.Repository
             Item = new ItemRepository(_db);
             Tag = new TagRepository(_db);
             Theme = new ThemeRepository(_db);
+            ItemTag = new ItemTagRepository(_db);
         }
 
         public void Save()

@@ -10,7 +10,7 @@ using WebApplication1.DataAccess.Data;
 namespace WebApplication1.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240305195325_InitialDb")]
+    [Migration("20240325110301_InitialDb")]
     partial class InitialDb
     {
         /// <inheritdoc />
@@ -20,21 +20,6 @@ namespace WebApplication1.DataAccess.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "7.0.16")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
-
-            modelBuilder.Entity("ItemTag", b =>
-                {
-                    b.Property<int>("ItemsId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TagsId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ItemsId", "TagsId");
-
-                    b.HasIndex("TagsId");
-
-                    b.ToTable("ItemTag");
-                });
 
             modelBuilder.Entity("WebApplication1.Models.Collection", b =>
                 {
@@ -102,6 +87,21 @@ namespace WebApplication1.DataAccess.Migrations
                         });
                 });
 
+            modelBuilder.Entity("WebApplication1.Models.ItemTag", b =>
+                {
+                    b.Property<int>("ItemId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TagId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ItemId", "TagId");
+
+                    b.HasIndex("TagId");
+
+                    b.ToTable("ItemTags");
+                });
+
             modelBuilder.Entity("WebApplication1.Models.Tag", b =>
                 {
                     b.Property<int>("Id")
@@ -156,21 +156,6 @@ namespace WebApplication1.DataAccess.Migrations
                         });
                 });
 
-            modelBuilder.Entity("ItemTag", b =>
-                {
-                    b.HasOne("WebApplication1.Models.Item", null)
-                        .WithMany()
-                        .HasForeignKey("ItemsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("WebApplication1.Models.Tag", null)
-                        .WithMany()
-                        .HasForeignKey("TagsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("WebApplication1.Models.Collection", b =>
                 {
                     b.HasOne("WebApplication1.Models.Theme", "Theme")
@@ -191,6 +176,35 @@ namespace WebApplication1.DataAccess.Migrations
                         .IsRequired();
 
                     b.Navigation("Collection");
+                });
+
+            modelBuilder.Entity("WebApplication1.Models.ItemTag", b =>
+                {
+                    b.HasOne("WebApplication1.Models.Item", "Item")
+                        .WithMany("ItemTags")
+                        .HasForeignKey("ItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WebApplication1.Models.Tag", "Tag")
+                        .WithMany("ItemTags")
+                        .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Item");
+
+                    b.Navigation("Tag");
+                });
+
+            modelBuilder.Entity("WebApplication1.Models.Item", b =>
+                {
+                    b.Navigation("ItemTags");
+                });
+
+            modelBuilder.Entity("WebApplication1.Models.Tag", b =>
+                {
+                    b.Navigation("ItemTags");
                 });
 #pragma warning restore 612, 618
         }

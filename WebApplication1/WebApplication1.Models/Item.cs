@@ -18,6 +18,6 @@ namespace WebApplication1.Models
         [ValidateNever]
         [ForeignKey(nameof(CollectionId))]
         public Collection Collection { get; set; }
-        public List<Tag> Tags { get; } = new();
+        public List<ItemTag> ItemTags { get; set; }
     }
 }

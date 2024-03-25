@@ -95,24 +95,24 @@ namespace WebApplication1.DataAccess.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "ItemTag",
+                name: "ItemTags",
                 columns: table => new
                 {
-                    ItemsId = table.Column<int>(type: "int", nullable: false),
-                    TagsId = table.Column<int>(type: "int", nullable: false)
+                    ItemId = table.Column<int>(type: "int", nullable: false),
+                    TagId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ItemTag", x => new { x.ItemsId, x.TagsId });
+                    table.PrimaryKey("PK_ItemTags", x => new { x.ItemId, x.TagId });
                     table.ForeignKey(
-                        name: "FK_ItemTag_Items_ItemsId",
-                        column: x => x.ItemsId,
+                        name: "FK_ItemTags_Items_ItemId",
+                        column: x => x.ItemId,
                         principalTable: "Items",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ItemTag_Tags_TagsId",
-                        column: x => x.TagsId,
+                        name: "FK_ItemTags_Tags_TagId",
+                        column: x => x.TagId,
                         principalTable: "Tags",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -155,16 +155,16 @@ namespace WebApplication1.DataAccess.Migrations
                 column: "CollectionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ItemTag_TagsId",
-                table: "ItemTag",
-                column: "TagsId");
+                name: "IX_ItemTags_TagId",
+                table: "ItemTags",
+                column: "TagId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ItemTag");
+                name: "ItemTags");
 
             migrationBuilder.DropTable(
                 name: "Items");

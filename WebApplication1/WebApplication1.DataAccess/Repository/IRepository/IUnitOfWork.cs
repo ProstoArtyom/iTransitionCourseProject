@@ -6,6 +6,7 @@
         IItemRepository Item { get; }
         ITagRepository Tag { get; }
         IThemeRepository Theme { get; }
+        IItemTagRepository ItemTag { get; }
         void Save();
     }
 }

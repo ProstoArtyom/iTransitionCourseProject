@@ -12,14 +12,24 @@ namespace WebApplication1.DataAccess.Data
         public DbSet<Item> Items { get; set; }
         public DbSet<Tag> Tags { get; set; }
         public DbSet<Theme> Themes { get; set; }
+        public DbSet<ItemTag> ItemTags { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<Item>()
-                .HasMany(c => c.Tags)
-                .WithMany(s => s.Items);
+            modelBuilder.Entity<ItemTag>()
+                .HasKey(it => new { it.ItemId, it.TagId });
+
+            modelBuilder.Entity<ItemTag>()
+                .HasOne(u => u.Item)
+                .WithMany(u => u.ItemTags)
+                .HasForeignKey(u => u.ItemId);
+
+            modelBuilder.Entity<ItemTag>()
+                .HasOne(u => u.Tag)
+                .WithMany(u => u.ItemTags)
+                .HasForeignKey(u => u.TagId);
 
             modelBuilder.Entity<Theme>().HasData(
                 new Theme { Id = 1, Name = "Books" },
