@@ -7,9 +7,11 @@ namespace WebApplication1.Models.ViewModels
     public class ItemVM
     {
         public Item Item { get; set; }
-        public string NewTagName { get; set; }
+        public string TagName { get; set; }
         public Dictionary<string, object[]> CustomFields { get; set; }
-
+        public string FieldName { get; set; }
+        public string FieldValue { get; set; }
+        public string FieldType { get; set; }
         public List<SelectListItem> TypesList { get; } = new()
         {
             new()

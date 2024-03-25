@@ -39,33 +39,27 @@ namespace WebApplication1.Areas.User.Controllers
                 CustomFields = customFields
             };
 
-            var errorMessage = TempData["Error"]?.ToString();
-            if (errorMessage != null)
-            {
-                ModelState.AddModelError("NewTagName", errorMessage);
-            }
-
             return View(ItemVm);
         }
 
         public async Task<IActionResult> AddTagAsync(ItemVM obj)
         {
-            var tagName = obj.NewTagName?.Trim();
+            var tagName = obj.TagName?.Trim();
             if (tagName == null)
             {
-                TempData["error"] = "The NewTagName field is required.";
+                TempData["error"] = "The TagName field is required.";
             }
             else if (tagName.Length < 5)
             {
-                TempData["error"] = "The NewTagName field's length can't be less than 5.";
+                TempData["error"] = "The TagName field's length can't be less than 5.";
             }
             else if (tagName.Length > 20)
             {
-                TempData["error"] = "The NewTagName field's length can't be greater than 20.";
+                TempData["error"] = "The TagName field's length can't be greater than 20.";
             }
             else if (Regex.IsMatch(tagName, "/#\\w+/gm"))
             {
-                TempData["error"] = "Incorrect characters for the NewTagName field.";
+                TempData["error"] = "Incorrect characters for the TagName field.";
             }
             else
             {
@@ -108,6 +102,25 @@ namespace WebApplication1.Areas.User.Controllers
 
             var tag = await _unitOfWork.Tag.GetAsync(u => u.Id == itemTag.TagId);
             TempData["success"] = $"The {tag.Name} tag has been removed!";
+
+            return RedirectToAction(nameof(Index), new { ItemId = itemId });
+        }
+
+        public async Task<IActionResult> AddFieldAsync(int itemId, string fieldName, string fieldValue, string fieldType)
+        {
+
+
+            var item = await _unitOfWork.Item.GetAsync(u => u.Id == itemId);
+            
+            var customFields = JsonConvert.DeserializeObject<Dictionary<string, object[]>>(item.CustomFields)!;
+            customFields.Add(fieldName, new object[] { fieldValue, fieldType });
+            var customFieldsJson = JsonConvert.SerializeObject(customFields);
+
+            item.CustomFields = customFieldsJson;
+            _unitOfWork.Item.Update(item);
+            _unitOfWork.Save();
+
+            TempData["success"] = $"The {fieldName} field has been successfully added!";
 
             return RedirectToAction(nameof(Index), new { ItemId = itemId });
         }

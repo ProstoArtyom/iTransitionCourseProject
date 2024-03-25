@@ -7,59 +7,43 @@
 <form method="post" class="row">
     <input asp-for="Item.Id" hidden />
     <div class="col-12 p-3">
+        <a class="btn btn-primary" style="width:150px" asp-action="">
+            <i class="bi bi-pencil-square"></i> Edit Item
+        </a>
+        <a class="btn btn-danger" style="width:150px" asp-action="">
+            <i class="bi bi-trash3"></i> Delete Item
+        </a>
+        <hr/>
         <div class="col-12 col-lg-6 form-outline mb-3">
             <label asp-for="Item.Name" class="ms-2 text-muted"></label>
-            <input asp-for="Item.Name" class="form-control" disabled />
-            <span asp-validation-for="Item.Name" class="text-danger"></span>
+            <input asp-for="Item.Name" class="form-control" disabled/>
         </div>
         <label class="ms-2 text-muted">Tags</label>
         <div class="d-flex flex-wrap">
             @foreach (var itemTag in Model.Item.ItemTags)
             {
                 <div class="col-4 col-lg-3 col-xl-2 form-outline mb-3 pe-2">
-                    <div class="input-group">
-                        <input asp-for="@itemTag.Tag.Name" class="form-control" disabled />
-                        <a asp-action="RemoveTag" asp-route-tagId="@itemTag.Tag.Id" asp-route-itemId="@Model.Item.Id" class="btn btn-danger">
-                            <i class="bi bi-x-lg"></i>
-                        </a>
-                    </div>
-                    <span asp-validation-for="@itemTag.Tag.Name" class="text-danger"></span>
+                    <input asp-for="@itemTag.Tag.Name" class="form-control" disabled/>
                 </div>
             }
         </div>
-        <div class="col-6 col-lg-4 col-xl-3 form-outline mb-3">
-            <div class="input-group">
-                <input asp-for="NewTagName" class="form-control"/>
-                <button asp-action="AddTag" class="btn btn-primary" type="submit">
-                    <i class="bi bi-plus-circle"></i> Add tag
-                </button>
-            </div>
-            <span asp-validation-for="NewTagName" class="text-danger"></span>
-        </div>
-        <button type="submit" class="btn btn-primary form-control" style="width:150px">
-            <i class="bi bi-pencil-square"></i> Edit
-        </button>
         <hr/>
-        <button type="submit" class="btn btn-primary form-control my-2" style="width:150px">
-            <i class="bi bi-plus-circle"></i> Add field
-        </button>
         @foreach (var field in Model.CustomFields)
         {
-            <div class="col-12 col-lg-6 form-outline mb-3">
-                <label class="ms-2 text-muted">@field.Key</label>
-                <input asp-for="@field.Value[0]" type="@field.Value[1]" class="form-control dynamic-input me-2"/>
-                <textarea asp-for="@field.Value[0]" class="form-control"></textarea>
-                <select asp-for="@field.Value[1]" asp-items="@Model.TypesList" class="form-select dynamic-select">
-                    <option disabled selected>--Select theme--</option>
-                </select>
-                <a asp-action="" class="btn btn-danger">
-                    <i class="bi bi-x-lg"></i>
-                </a>
+            <div class="row">
+                <div class="col-12 col-lg-8 form-outline mb-3">
+                    <label class="ms-2 text-muted">@field.Key</label>
+                    <input asp-for="@field.Value[0]" type="@field.Value[1]" class="form-control dynamic-input me-2" placeholder="Field Value" disabled/>
+                    <textarea asp-for="@field.Value[0]" class="form-control" disabled></textarea>
+                </div>
+                <div class="col-12 col-lg-4 form-outline mb-3">
+                    <label class="ms-2 text-muted">Type</label>
+                    <select asp-for="@field.Value[1]" asp-items="@Model.TypesList" class="form-select dynamic-select" disabled>
+                        <option disabled selected>--Select theme--</option>
+                    </select>
+                </div>
             </div>
         }
-        <button type="submit" class="btn btn-primary form-control" style="width:150px">
-            <i class="bi bi-pencil-square"></i> Edit
-        </button>
     </div>
 </form>
 
@@ -68,8 +52,8 @@
     <script>
         function setInputType(element) {
             var selectedType = element.val();
-            var inputField = element.siblings('.dynamic-input');
-            var textareaField = element.siblings('textarea');
+            var inputField = element.closest('.row').find('.dynamic-input');
+            var textareaField = element.closest('.row').find('textarea');
 
             if (selectedType == 'textarea') {
                 textareaField.show();
@@ -94,5 +78,5 @@
         $('.dynamic-select').change(function () {
             setInputType($(this));
         });
-</script>
+    </script>
 }
