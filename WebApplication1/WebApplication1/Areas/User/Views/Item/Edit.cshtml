@@ -1,0 +1,179 @@
+﻿@model ItemVM
+
+<a asp-action="Index" asp-route-itemId="@Model.Item.Id" class="btn btn-outline-primary form-control" style="width:200px">
+    <i class="bi bi-arrow-return-left"></i> Back to Item Page
+</a>
+
+<hr />
+
+<form asp-action="AddTag" method="post" class="row">
+    <input asp-for="Item.Id" hidden />
+    <div class="col-12 p-3">
+        <div class="col-6 col-lg-4 col-xl-3 form-outline mb-3">
+            <label class="ms-2 text-muted">New Tag</label>
+            <div class="input-group">
+                <input asp-for="TagName" class="form-control" placeholder="Tag Value"/>
+                <button class="btn btn-primary" type="submit">
+                    <i class="bi bi-plus-circle"></i> Add tag
+                </button>
+            </div>
+            <span asp-validation-for="TagName" class="text-danger"></span>
+        </div>
+    </div>
+</form>
+
+<hr/>
+
+<form asp-action="AddField" method="post" class="row">
+    <input asp-for="Item.Id" hidden />
+    <div class="col-12 p-3">
+        <div class="row">
+            <div class="col-12 col-lg-8 form-outline mb-3">
+                <label class="ms-2 text-muted">New Field</label>
+                <input asp-for="FieldName" type="text" class="form-control me-2" placeholder="Field Name" />
+                <input asp-for="FieldValueInput" type="@Model.FieldType" class="form-control dynamic-input me-2" placeholder="Field Value" />
+                <textarea asp-for="FieldValueTextArea" class="form-control"></textarea>
+                <div class="row">
+                    <span asp-validation-for="FieldName" class="text-danger"></span>
+                    <span id="FieldValueInputValidation" asp-validation-for="FieldValueInput" class="text-danger"></span>
+                    <span id="FieldValueTextAreaValidation" asp-validation-for="FieldValueTextArea" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-12 col-lg-4 form-outline mb-3">
+                <label class="ms-2 text-muted">Type</label>
+                <select asp-for="FieldType" asp-items="@Model.TypesList" class="form-select dynamic-select">
+                    <option disabled selected>--Select theme--</option>
+                </select>
+                <span id="FieldType" asp-validation-for="FieldType" class="text-danger"></span>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary form-control my-2" style="width:150px">
+            <i class="bi bi-plus-circle"></i> Add field
+        </button>
+    </div>
+</form>
+
+<hr />
+
+<form method="post" class="row">
+    <input asp-for="Item.Id" hidden />
+    <div class="col-12 p-3">
+        <div class="col-12 col-lg-6 form-outline mb-3">
+            <label asp-for="Item.Name" class="ms-2 text-muted"></label>
+            <input asp-for="Item.Name" class="form-control" />
+            <span asp-validation-for="Item.Name" class="text-danger"></span>
+        </div>
+        <label class="ms-2 text-muted">Tags</label>
+        <div class="d-flex flex-wrap">
+            @if (Model.Item.ItemTags.Count > 0)
+            {
+                @foreach (var itemTag in Model.Item.ItemTags)
+                {
+                    <div class="col-4 col-lg-3 col-xl-2 form-outline mb-3 pe-2">
+                        <div class="input-group">
+                            <input asp-for="@itemTag.Tag.Name" class="form-control"/>
+                            <a asp-action="RemoveTag" asp-route-tagId="@itemTag.Tag.Id" asp-route-itemId="@Model.Item.Id" class="btn btn-danger">
+                                <i class="bi bi-x-lg"></i>
+                            </a>
+                        </div>
+                        <span asp-validation-for="@itemTag.Tag.Name" class="text-danger"></span>
+                    </div>
+                }
+            }
+            else
+            {
+                <input class="form-control" disabled
+                       value="There're no tags related to the item!" />
+            }
+        </div>
+        <hr/>
+        @if (Model.CustomFields.Count > 0)
+        {
+            @foreach (var field in Model.CustomFields)
+            {
+                <div class="row">
+                    <div class="col-12 col-lg-8 form-outline mb-3">
+                        <label class="ms-2 text-muted">@field.Key</label>
+                        <input name="CustomFields[@field.Key][0]" asp-for="@field.Value[0]" type="@field.Value[1]" class="form-control dynamic-input me-2" placeholder="Field Value"/>
+                        <textarea name="CustomFields[@field.Key][1]" asp-for="@field.Value[0]" class="form-control"></textarea>
+                    </div>
+                    <div class="col-11 col-lg-3 form-outline mb-3">
+                        <label class="ms-2 text-muted">Type</label>
+                        <select name="CustomFields[@field.Key][2]" asp-for="@field.Value[1]" asp-items="@Model.TypesList" class="form-select dynamic-select">
+                            <option disabled selected>--Select theme--</option>
+                        </select>
+                    </div>
+                    <div class="col-1 col-lg-1 form-outline mt-4 mb-3">
+                        <a asp-action="RemoveField" class="btn btn-danger"
+                           asp-route-fieldKey="@field.Key" asp-route-itemId="@Model.Item.Id">
+                            <i class="bi bi-x-lg"></i>
+                        </a>
+                    </div>
+                </div>
+                <hr/>
+            }
+        }
+        else
+        {
+            <h4 class="text-center">There're no custom field!</h4>
+        }
+        <button type="submit" class="btn btn-primary form-control" style="width:150px">
+            <i class="bi bi-floppy"></i> Save
+        </button>
+    </div>
+</form>
+
+@section Scripts
+{
+    <script>
+        function setInputType(element) {
+            var selectedType = element.val();
+            var inputField = element.closest('.row').find('.dynamic-input');
+            var textareaField = element.closest('.row').find('textarea');
+
+            if (selectedType == 'textarea') {
+                textareaField.show();
+                inputField.hide();
+                return;
+            }
+            else if (selectedType === 'checkbox') {
+                inputField.removeClass('form-control').addClass('form-check-input');
+                inputField.change(function () {
+                    if ($(this).is(':checked')) {
+                        $(this).val('true');
+                    } else {
+                        $(this).val('false');
+                    }
+                });
+            } else {
+                inputField.removeClass('form-check-input').addClass('form-control');
+            }
+
+            inputField.attr('type', selectedType);
+            textareaField.hide();
+            inputField.show();
+        }
+
+        $('.dynamic-select').each(function () {
+            setInputType($(this));
+        });
+
+        $('.dynamic-select').change(function () {
+            setInputType($(this));
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            $('#FieldType').change(function () {
+                if ($(this).val() == 'textarea') {
+                    $('#FieldValueInputValidation').hide();
+                    $('#FieldValueTextAreaValidation').show();
+                } else {
+                    $('#FieldValueInputValidation').show();
+                    $('#FieldValueTextAreaValidation').hide();
+                }
+            });
+        });
+    </script>
+    <partial name="_ValidationScriptsPartial" />
+}

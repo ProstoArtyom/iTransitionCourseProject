@@ -7,10 +7,11 @@
 <form method="post" class="row">
     <input asp-for="Item.Id" hidden />
     <div class="col-12 p-3">
-        <a class="btn btn-primary" style="width:150px" asp-action="">
+        <a asp-action="Edit" asp-route-itemId="@Model.Item.Id" class="btn btn-primary" style="width:150px">
             <i class="bi bi-pencil-square"></i> Edit Item
         </a>
-        <a class="btn btn-danger" style="width:150px" asp-action="">
+        <a onclick="Delete('@Url.Action("Delete", new { ItemId = @Model.Item.Id })', @Model.Item.CollectionId)"
+            class="btn btn-danger" style="width:150px">
             <i class="bi bi-trash3"></i> Delete Item
         </a>
         <hr/>
@@ -20,29 +21,45 @@
         </div>
         <label class="ms-2 text-muted">Tags</label>
         <div class="d-flex flex-wrap">
-            @foreach (var itemTag in Model.Item.ItemTags)
+            @if (Model.Item.ItemTags.Count > 0)
             {
-                <div class="col-4 col-lg-3 col-xl-2 form-outline mb-3 pe-2">
-                    <input asp-for="@itemTag.Tag.Name" class="form-control" disabled/>
-                </div>
+                @foreach (var itemTag in Model.Item.ItemTags)
+                {
+                    <div class="col-4 col-lg-3 col-xl-2 form-outline mb-3 pe-2">
+                        <input asp-for="@itemTag.Tag.Name" class="form-control" disabled/>
+                    </div>
+                }
+            }
+            else
+            {
+                <input class="form-control" disabled
+                       value="There're no tags related to the item! You can add them in edit page." />
             }
         </div>
         <hr/>
-        @foreach (var field in Model.CustomFields)
+        @if (Model.CustomFields.Count > 0)
         {
-            <div class="row">
-                <div class="col-12 col-lg-8 form-outline mb-3">
-                    <label class="ms-2 text-muted">@field.Key</label>
-                    <input asp-for="@field.Value[0]" type="@field.Value[1]" class="form-control dynamic-input me-2" placeholder="Field Value" disabled/>
-                    <textarea asp-for="@field.Value[0]" class="form-control" disabled></textarea>
+            @foreach (var field in Model.CustomFields)
+            {
+                <div class="row">
+                    <div class="col-12 col-lg-8 form-outline mb-3">
+                        <label class="ms-2 text-muted">@field.Key</label>
+                        <input asp-for="@field.Value[0]" type="@field.Value[1]" class="form-control dynamic-input me-2" placeholder="Field Value" disabled/>
+                        <textarea asp-for="@field.Value[0]" class="form-control" disabled></textarea>
+                    </div>
+                    <div class="col-12 col-lg-4 form-outline mb-3">
+                        <label class="ms-2 text-muted">Type</label>
+                        <select asp-for="@field.Value[1]" asp-items="@Model.TypesList" class="form-select dynamic-select" disabled>
+                            <option disabled selected>--Select theme--</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="col-12 col-lg-4 form-outline mb-3">
-                    <label class="ms-2 text-muted">Type</label>
-                    <select asp-for="@field.Value[1]" asp-items="@Model.TypesList" class="form-select dynamic-select" disabled>
-                        <option disabled selected>--Select theme--</option>
-                    </select>
-                </div>
-            </div>
+            }
+        }
+        else
+        {
+            <h4 class="text-center">There're no custom field!</h4>
+            <p class="text-center">You can add them in edit page.</p>
         }
     </div>
 </form>
@@ -78,5 +95,28 @@
         $('.dynamic-select').change(function () {
             setInputType($(this));
         });
+    </script>
+    <script>
+        function Delete(url, collectionId) {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: url,
+                        type: 'DELETE',
+                        success: function (data) {
+                            window.location.href = '/User/Collection/Index?collectionId=' + collectionId;
+                            toastr.success('The item has been successfully deleted');
+                        }
+                    })
+                }
+            });
+        }
     </script>
 }

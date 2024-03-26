@@ -9,6 +9,7 @@ namespace WebApplication1.Models
         [Key]
         public int Id { get; set; }
         [Required]
+        [MaxLength(20)]
         public string Name { get; set; }
         public List<ItemTag> ItemTags { get; set; }
     }
