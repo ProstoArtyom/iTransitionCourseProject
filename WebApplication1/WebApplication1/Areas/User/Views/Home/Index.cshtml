@@ -1,13 +1,38 @@
-﻿@model IEnumerable<Collection>
+﻿@model HomeVM
 
 <div class="text-center">
-    <h2 class="mb-4">Collections List</h2>
-    <div class="text-end mb-2">
-        <a asp-action="AddSync" asp-controller="Collection"
-            class="btn btn-primary" style="width:150px">
-            <i class="bi bi-plus-circle"></i> Add Item
-        </a>
-    </div>
+    <h2 class="mb-4">Last Added Items</h2>
+    <table id="tblItems" class="table table-bordered table-striped table-hover" style="width:100%">
+        <thead>
+        <tr>
+            <th>№</th>
+            <th>Name</th>
+            <th>Tags</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in Model.Items)
+        {
+            <tr onclick="location.href = '@Url.Action("Index", "Item", new { ItemId = item.Id })'">
+                <td>
+                    @item.Id
+                </td>
+                <td>
+                    @item.Name
+                </td>
+                <td>
+                    @($"{string.Join(", ", item.ItemTags.Take(3).Select(u => u.Tag.Name))}...")
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+
+<hr/>
+
+<div class="text-center">
+    <h2 class="mb-4">Top 5 of The Biggest Collections</h2>
     <table id="tblCollections" class="table table-bordered table-striped table-hover" style="width:100%">
         <thead>
             <tr>
@@ -17,36 +42,56 @@
                 <th>Theme</th>
             </tr>
         </thead>
+        <tbody>
+            @foreach (var collection in Model.Collections)
+            {
+                <tr onclick="location.href = '@Url.Action("Index", "Collection", new { CollectionId = collection.Id })'">
+                    <td>
+                        @collection.Id
+                    </td>
+                    <td>
+                        @collection.Name
+                    </td>
+                    <td>
+                        @Html.Raw(@collection.Description)
+                    </td>
+                    <td>
+                        @collection.Theme.Name
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<hr/>
+
+<div class="text-center">
+    <h2 class="mb-4">The Tag List</h2>
+    <table id="tblTags" class="table table-bordered table-striped table-hover" style="width:100%">
+        <thead>
+        <tr>
+            <th>№</th>
+            <th>Name</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var tag in Model.Tags)
+        {
+            <tr @* onclick="location.href = '@Url.Action("Index", "Collection", new { CollectionId = collection.Id })'" *@>
+                <td>
+                    @tag.Id
+                </td>
+                <td>
+                    @tag.Name
+                </td>
+            </tr>
+        }
+        </tbody>
     </table>
 </div>
 
 @section Scripts
 {
-    <script>
-        $(document).ready(function () {
-            var table = $('#tblCollections').DataTable({
-                "processing": true,
-                "serverSide": true,
-                "filter": true,
-                "orderMulti": false,
-                "ajax": {
-                    "url": "/user/home/loaddata",
-                    "type": "POST",
-                    "datatype": "json"
-                },
-                "columns": [
-                    { "data": "id", "name": "id", "autoWidth": true },
-                    { "data": "name", "name": "name", "autoWidth": true },
-                    { "data": "description", "name": "description", "autoWidth": true },
-                    { "data": "theme.name", "name": "theme.name", "autoWidth": true },
-                ]
-            });
 
-            $('#tblCollections tbody').on('click', 'tr', function () {
-                var data = table.row(this).data();
-                console.log(data.id);
-                window.location.href = '/User/Collection/Index?collectionId=' + data.id;
-            });
-        });
-    </script>
 }

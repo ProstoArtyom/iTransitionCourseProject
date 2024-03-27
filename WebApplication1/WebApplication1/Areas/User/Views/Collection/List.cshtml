@@ -1,0 +1,52 @@
+﻿
+
+<div class="text-center">
+    <h2 class="mb-4">Collections List</h2>
+    <div class="text-end mb-2">
+        <a asp-action="AddSync" asp-controller="Collection"
+           class="btn btn-primary" style="width:150px">
+            <i class="bi bi-plus-circle"></i> Add Item
+        </a>
+    </div>
+    <table id="tblCollections" class="table table-bordered table-striped table-hover" style="width:100%">
+        <thead>
+        <tr>
+            <th>№</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Theme</th>
+        </tr>
+        </thead>
+    </table>
+</div>
+
+@section Scripts
+{
+    <script>
+        $(document).ready(function () {
+            var table = $('#tblCollections').DataTable({
+                "processing": true,
+                "serverSide": true,
+                "filter": true,
+                "orderMulti": false,
+                "ajax": {
+                    "url": "/user/collection/loaddata",
+                    "type": "POST",
+                    "datatype": "json"
+                },
+                "columns": [
+                    { "data": "id", "name": "id", "autoWidth": true },
+                    { "data": "name", "name": "name", "autoWidth": true },
+                    { "data": "description", "name": "description", "autoWidth": true },
+                    { "data": "theme.name", "name": "theme.name", "autoWidth": true },
+                ]
+            });
+
+            $('#tblCollections tbody').on('click', 'tr', function () {
+                var data = table.row(this).data();
+                console.log(data.id);
+                window.location.href = '/User/Collection/Index?collectionId=' + data.id;
+            });
+        });
+    </script>
+}

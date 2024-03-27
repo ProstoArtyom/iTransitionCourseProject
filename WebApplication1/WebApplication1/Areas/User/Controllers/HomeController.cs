@@ -3,6 +3,7 @@ using System.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.DataAccess.Repository.IRepository;
 using WebApplication1.Models;
+using WebApplication1.Models.ViewModels;
 
 namespace WebApplication1.Areas.User.Controllers
 {
@@ -19,8 +20,24 @@ namespace WebApplication1.Areas.User.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var collections = await _unitOfWork.Collection.GetAllAsync(includeProperties: "Theme");
-            return View(collections);
+            var collections = await _unitOfWork.Collection.GetAllLargestAsync(count: 5, includeProperties: "Theme");
+            var tags = await _unitOfWork.Tag.GetAllAsync();
+            var items = await _unitOfWork.Item.GetAllAsync(ordering: "id desc", pageSize: 10);
+            foreach (var item in items)
+            {
+                var itemTags =
+                    await _unitOfWork.ItemTag.GetAllAsync(u => u.ItemId == item.Id, includeProperties: "Tag");
+                item.ItemTags = itemTags.ToList();
+            }
+
+            var homeVm = new HomeVM
+            {
+                Collections = collections,
+                Items = items,
+                Tags = tags
+            };
+                
+            return View(homeVm);
         }
 
         public IActionResult Privacy()
@@ -32,30 +49,6 @@ namespace WebApplication1.Areas.User.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> LoadDataAsync()
-        {
-            var draw = HttpContext.Request.Form["draw"].FirstOrDefault();
-            var start = Request.Form["start"].FirstOrDefault();
-            var length = Request.Form["length"].FirstOrDefault();
-            var sortColumn = Request.Form["columns[" + Request.Form["order[0][column]"].FirstOrDefault() + "][name]"].FirstOrDefault();
-            var sortColumnDirection = Request.Form["order[0][dir]"].FirstOrDefault();
-            var searchValue = Request.Form["search[value]"].FirstOrDefault();
-
-            int pageSize = length != null ? Convert.ToInt32(length) : 0;
-            int skip = start != null ? Convert.ToInt32(start) : 0;
-
-            var collections = await _unitOfWork.Collection
-                .GetAllAsync(searchText: searchValue, 
-                    skipAmount: skip, pageSize: pageSize, 
-                    ordering: $"{sortColumn} {sortColumnDirection}",
-                    includeProperties: "Theme");
-
-            var recordsTotal = collections.Count();
-
-            return Json(new { Draw = draw, RecordsFiltered = recordsTotal, RecordsTotal = recordsTotal, Data = collections });
         }
     }
 }

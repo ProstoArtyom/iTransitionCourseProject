@@ -109,5 +109,34 @@ namespace WebApplication1.Areas.User.Controllers
 
             return RedirectToAction("Index", "Home");
         }
+
+        public async Task<IActionResult> List()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> LoadDataAsync()
+        {
+            var draw = HttpContext.Request.Form["draw"].FirstOrDefault();
+            var start = Request.Form["start"].FirstOrDefault();
+            var length = Request.Form["length"].FirstOrDefault();
+            var sortColumn = Request.Form["columns[" + Request.Form["order[0][column]"].FirstOrDefault() + "][name]"].FirstOrDefault();
+            var sortColumnDirection = Request.Form["order[0][dir]"].FirstOrDefault();
+            var searchValue = Request.Form["search[value]"].FirstOrDefault();
+
+            int pageSize = length != null ? Convert.ToInt32(length) : 0;
+            int skip = start != null ? Convert.ToInt32(start) : 0;
+
+            var collections = await _unitOfWork.Collection
+                .GetAllAsync(searchText: searchValue,
+                    skipAmount: skip, pageSize: pageSize,
+                    ordering: $"{sortColumn} {sortColumnDirection}",
+                    includeProperties: "Theme");
+
+            var recordsTotal = collections.Count();
+
+            return Json(new { Draw = draw, RecordsFiltered = recordsTotal, RecordsTotal = recordsTotal, Data = collections });
+        }
     }
 }
