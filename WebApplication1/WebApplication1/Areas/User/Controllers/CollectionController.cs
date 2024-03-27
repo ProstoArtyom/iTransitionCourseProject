@@ -80,5 +80,34 @@ namespace WebApplication1.Areas.User.Controllers
 
             return View(CollectionVm);
         }
+
+        public async Task<IActionResult> AddSync()
+        {
+            var theme = await _unitOfWork.Theme.GetAsync(u => u.Name == "Other");
+            var collection = new Collection
+            {
+                Name = "",
+                Description = "",
+                Items = new List<Item>(),
+                ThemeId = theme.Id
+            };
+            _unitOfWork.Collection.AddAsync(collection);
+            _unitOfWork.Save();
+
+            TempData["success"] = "The collection has been successfully created!";
+
+            return RedirectToAction("Index", "Home");
+        }
+
+        public async Task<IActionResult> Delete(int collectionId)
+        {
+            var collection = await _unitOfWork.Collection.GetAsync(u => u.Id == collectionId);
+            _unitOfWork.Collection.Remove(collection);
+            _unitOfWork.Save();
+
+            TempData["success"] = "The collection has been successfully deleted!";
+
+            return RedirectToAction("Index", "Home");
+        }
     }
 }

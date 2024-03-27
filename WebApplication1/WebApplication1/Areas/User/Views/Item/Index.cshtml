@@ -10,7 +10,7 @@
         <a asp-action="Edit" asp-route-itemId="@Model.Item.Id" class="btn btn-primary" style="width:150px">
             <i class="bi bi-pencil-square"></i> Edit Item
         </a>
-        <a onclick="Delete('@Url.Action("Delete", new { ItemId = @Model.Item.Id })', @Model.Item.CollectionId)"
+        <a onclick="DeleteItem('@Url.Action("Delete", new { ItemId = @Model.Item.Id })', @Model.Item.CollectionId)"
             class="btn btn-danger" style="width:150px">
             <i class="bi bi-trash3"></i> Delete Item
         </a>
@@ -97,7 +97,7 @@
         });
     </script>
     <script>
-        function Delete(url, collectionId) {
+        function DeleteItem(url, collectionId) {
             Swal.fire({
                 title: "Are you sure?",
                 text: "You won't be able to revert this!",
@@ -112,7 +112,7 @@
                         type: 'DELETE',
                         success: function (data) {
                             window.location.href = '/User/Collection/Index?collectionId=' + collectionId;
-                            toastr.success('The item has been successfully deleted');
+                            toastr.success('The item has been successfully deleted!');
                         }
                     })
                 }

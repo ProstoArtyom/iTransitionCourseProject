@@ -22,6 +22,9 @@
         <button type="submit" class="btn btn-primary form-control" style="width:150px">
             <i class="bi bi-floppy"></i> Save
         </button>
+        <a onclick="DeleteCollection('@Url.Action("Delete", new { CollectionId = Model.Collection.Id })')" class="btn btn-danger" style="width:150px">
+            <i class="bi bi-trash3"></i> Delete
+        </a>
     </div>
 </form>
 
@@ -74,6 +77,29 @@
         $(document).ready(function () {
             $('#tblCollection').DataTable();
         });
+    </script>
+    <script>
+        function DeleteCollection(url) {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: url,
+                        type: 'DELETE',
+                        success: function (data) {
+                            window.location.href = '/User/Home/Index';
+                            toastr.success('The collection has been successfully deleted!');
+                        }
+                    })
+                }
+            });
+        }
     </script>
     <partial name="_ValidationScriptsPartial"/>
 }

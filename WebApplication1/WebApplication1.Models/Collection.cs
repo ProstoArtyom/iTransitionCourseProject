@@ -13,7 +13,6 @@ namespace WebApplication1.Models
         public string Name { get; set; }
         [Required]
         public string Description { get; set; }
-        [Required]
         public int ThemeId { get; set; }
         [ValidateNever]
         [ForeignKey(nameof(ThemeId))]

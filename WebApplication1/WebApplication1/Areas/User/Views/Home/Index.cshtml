@@ -3,11 +3,9 @@
 <div class="text-center">
     <h2 class="mb-4">Collections List</h2>
     <div class="text-end mb-2">
-        <a class="btn btn-primary" style="width:150px" asp-action="">
+        <a asp-action="AddSync" asp-controller="Collection"
+            class="btn btn-primary" style="width:150px">
             <i class="bi bi-plus-circle"></i> Add Item
-        </a>
-        <a class="btn btn-danger" style="width:150px" asp-action="">
-            <i class="bi bi-trash3"></i> Delete Item
         </a>
     </div>
     <table id="tblCollections" class="table table-bordered table-striped table-hover" style="width:100%">
