@@ -31,9 +31,13 @@ namespace WebApplication1.Areas.User.Controllers
                 }
             }
 
+            var collections = (await _unitOfWork.Collection.GetAllAsync(searchText: searchText, includeProperties: "Theme")).ToList();
+
             var searchVm = new SearchVM
             {
-                Items = items
+                Items = items,
+                Collections = collections,
+                SearchText = searchText,
             };
 
             return View(searchVm);
@@ -49,9 +53,12 @@ namespace WebApplication1.Areas.User.Controllers
                 item.ItemTags = itemTagsForItem.ToList();
             }
 
+            var tag = await _unitOfWork.Tag.GetAsync(u => u.Id == tagId);
             var searchVm = new SearchVM
             {
-                Items = items
+                Items = items,
+                Collections = new List<Collection>(),
+                SearchText = tag.Name
             };
 
             return View("Index", searchVm);

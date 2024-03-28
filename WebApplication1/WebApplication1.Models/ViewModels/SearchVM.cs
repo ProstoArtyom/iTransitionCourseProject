@@ -10,5 +10,6 @@ namespace WebApplication1.Models.ViewModels
     {
         public IEnumerable<Item> Items { get; set; }
         public IEnumerable<Collection> Collections { get; set; }
+        public string SearchText { get; set; }
     }
 }
