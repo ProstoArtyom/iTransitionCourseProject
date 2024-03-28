@@ -1,5 +1,10 @@
 ﻿@model ItemVM
 
+@{
+    var claimsIdentity = (ClaimsIdentity)User.Identity;
+    var userId = claimsIdentity?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+}
+
 <a asp-controller="Collection" asp-action="Index" asp-route-collectionId="@Model.Item.CollectionId" class="btn btn-outline-primary form-control" style="width:200px">
     <i class="bi bi-arrow-return-left"></i> Back to Collection
 </a>
@@ -7,13 +12,16 @@
 <form method="post" class="row">
     <input asp-for="Item.Id" hidden />
     <div class="col-12 p-3">
-        <a asp-action="Edit" asp-route-itemId="@Model.Item.Id" class="btn btn-primary" style="width:150px">
-            <i class="bi bi-pencil-square"></i> Edit Item
-        </a>
-        <a onclick="DeleteItem('@Url.Action("Delete", new { ItemId = @Model.Item.Id })', @Model.Item.CollectionId)"
-            class="btn btn-danger" style="width:150px">
-            <i class="bi bi-trash3"></i> Delete Item
-        </a>
+        @if (Model.UserId == userId || User.IsInRole(SD.Role_Admin))
+        {
+            <a asp-action="Edit" asp-route-itemId="@Model.Item.Id" class="btn btn-primary" style="width:150px">
+                <i class="bi bi-pencil-square"></i> Edit Item
+            </a>
+            <a onclick="DeleteItem('@Url.Action("Delete", new { ItemId = @Model.Item.Id })', @Model.Item.CollectionId)"
+                class="btn btn-danger" style="width:150px">
+                <i class="bi bi-trash3"></i> Delete Item
+            </a>
+        }
         <hr/>
         <div class="col-12 col-lg-6 form-outline mb-3">
             <label asp-for="Item.Name" class="ms-2 text-muted"></label>

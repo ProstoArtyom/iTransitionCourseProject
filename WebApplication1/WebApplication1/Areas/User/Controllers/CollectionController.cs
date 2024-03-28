@@ -1,10 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Duende.IdentityServer.Extensions;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Diagnostics;
+using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
+using System.Security.Claims;
 using WebApplication1.DataAccess.Repository.IRepository;
 using WebApplication1.Models;
 using WebApplication1.Models.ViewModels;
+using WebApplication1.Utility;
 
 namespace WebApplication1.Areas.User.Controllers
 {
@@ -54,9 +59,21 @@ namespace WebApplication1.Areas.User.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> Index()
         {
             var collectionFromDb = await _unitOfWork.Collection.GetAsync(u => u.Id == CollectionVm.Collection.Id);
+
+            if (User.IsInRole(SD.Role_User))
+            {
+                var claimsIdentity = (ClaimsIdentity)User.Identity;
+                var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+                if (collectionFromDb.ApplicationUserId != userId)
+                {
+                    return StatusCode(403);
+                }
+            }
 
             collectionFromDb.Name = CollectionVm.Collection.Name;
             collectionFromDb.Description = CollectionVm.Collection.Description;
@@ -82,15 +99,20 @@ namespace WebApplication1.Areas.User.Controllers
             return View(CollectionVm);
         }
 
+        [Authorize]
         public async Task<IActionResult> AddSync()
         {
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+
             var theme = await _unitOfWork.Theme.GetAsync(u => u.Name == "Other");
             var collection = new Collection
             {
                 Name = "",
                 Description = "",
                 Items = new List<Item>(),
-                ThemeId = theme.Id
+                ThemeId = theme.Id,
+                ApplicationUserId = userId
             };
             _unitOfWork.Collection.AddAsync(collection);
             _unitOfWork.Save();
@@ -100,9 +122,19 @@ namespace WebApplication1.Areas.User.Controllers
             return RedirectToAction("List", "Collection");
         }
 
+        [Authorize]
         public async Task<IActionResult> Delete(int collectionId)
         {
             var collection = await _unitOfWork.Collection.GetAsync(u => u.Id == collectionId);
+
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            if (collection.ApplicationUserId != userId)
+            {
+                return StatusCode(403);
+            }
+
             _unitOfWork.Collection.Remove(collection);
             _unitOfWork.Save();
 
@@ -129,8 +161,18 @@ namespace WebApplication1.Areas.User.Controllers
             int pageSize = length != null ? Convert.ToInt32(length) : 0;
             int skip = start != null ? Convert.ToInt32(start) : 0;
 
+            Expression<Func<Collection, bool>> filter = u => true;
+            if (User.IsAuthenticated() && User.IsInRole(SD.Role_User))
+            {
+                var claimsIdentity = (ClaimsIdentity)User.Identity;
+                var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+                filter = u => u.ApplicationUserId == userId;
+            }
+
             var collections = await _unitOfWork.Collection
-                .GetAllAsync(searchText: searchValue,
+                .GetAllAsync(filter,
+                    searchText: searchValue,
                     skipAmount: skip, pageSize: pageSize,
                     ordering: $"{sortColumn} {sortColumnDirection}",
                     includeProperties: "Theme");

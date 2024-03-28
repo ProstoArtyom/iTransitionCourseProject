@@ -15,6 +15,7 @@ namespace WebApplication1.DataAccess.Data
         public DbSet<Tag> Tags { get; set; }
         public DbSet<Theme> Themes { get; set; }
         public DbSet<ItemTag> ItemTags { get; set; }
+        public DbSet<ApplicationUser> ApplicationUsers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -34,45 +35,10 @@ namespace WebApplication1.DataAccess.Data
                 .HasForeignKey(u => u.TagId);
 
             modelBuilder.Entity<Theme>().HasData(
-                new Theme { Id = 1, Name = "Books" },
-                new Theme { Id = 2, Name = "Signs" },
-                new Theme { Id = 3, Name = "Silverware" }
-            );
-
-            modelBuilder.Entity<Collection>().HasData(
-                new Collection
-                {
-                    Id = 1,
-                    Name = "Collection №1",
-                    Description = "It's a description for collection №1",
-                    ThemeId = 2
-                }
-            );
-            
-            modelBuilder.Entity<Tag>().HasData(
-                new Tag
-                {
-                    Id = 1,
-                    Name = "Cool_Collection"
-                }
-            );
-
-            var customFields = new
-            {
-                Book = "Librarian of Basra",
-                Author = "Jeanette Winter",
-                Published = new DateOnly(1939, 12, 04)
-            };
-            var customFieldsJson = JsonConvert.SerializeObject(customFields);
-
-            modelBuilder.Entity<Item>().HasData(
-                new Item
-                {
-                    Id = 1, 
-                    Name = "Book 1",
-                    CustomFields = customFieldsJson,
-                    CollectionId = 1
-                }
+                new Theme { Id = 1, Name = "Other" },
+                new Theme { Id = 2, Name = "Books" },
+                new Theme { Id = 3, Name = "Signs" },
+                new Theme { Id = 4, Name = "Silverware" }
             );
         }
     }

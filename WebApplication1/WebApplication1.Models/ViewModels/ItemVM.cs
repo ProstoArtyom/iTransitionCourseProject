@@ -11,6 +11,8 @@ namespace WebApplication1.Models.ViewModels
         [MinLength(5)]
         [MaxLength(20)]
         public string TagName { get; set; }
+        [Required]
+        public string UserId { get; set; }
         public Dictionary<string, string[]> CustomFields { get; set; }
         [Required]
         [MinLength(5)]

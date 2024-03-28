@@ -9,6 +9,9 @@ using WebApplication1.Models;
 using WebApplication1.Models.ViewModels;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+using WebApplication1.Utility;
 
 namespace WebApplication1.Areas.User.Controllers
 {
@@ -30,6 +33,7 @@ namespace WebApplication1.Areas.User.Controllers
         public async Task<IActionResult> Index(int itemId)
         {
             var item = await _unitOfWork.Item.GetAsync(u => u.Id == itemId);
+            var collection = await _unitOfWork.Collection.GetAsync(u => u.Id == item.CollectionId);
             var itemTags =
                 await _unitOfWork.ItemTag.GetAllAsync(u => u.ItemId == itemId, includeProperties: "Tag");
             item.ItemTags = itemTags.ToList();
@@ -38,15 +42,27 @@ namespace WebApplication1.Areas.User.Controllers
             ItemVm = new()
             {
                 Item = item,
-                CustomFields = customFields
+                CustomFields = customFields,
+                UserId = collection.ApplicationUserId
             };
 
             return View(ItemVm);
         }
 
+        [Authorize]
         public async Task<IActionResult> Edit(int itemId)
         {
             var item = await _unitOfWork.Item.GetAsync(u => u.Id == itemId);
+            var collection = await _unitOfWork.Collection.GetAsync(u => u.Id == item.CollectionId);
+
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            if (User.IsInRole(SD.Role_User) && collection.ApplicationUserId != userId)
+            {
+                return StatusCode(403);
+            }
+
             var itemTags =
                 await _unitOfWork.ItemTag.GetAllAsync(u => u.ItemId == itemId, includeProperties: "Tag");
             item.ItemTags = itemTags.ToList();
@@ -55,15 +71,28 @@ namespace WebApplication1.Areas.User.Controllers
             ItemVm = new()
             {
                 Item = item,
-                CustomFields = customFields
+                CustomFields = customFields,
+                UserId = collection.ApplicationUserId
             };
 
             return View(ItemVm);
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> Edit(ItemVM obj)
         {
+            var item = await _unitOfWork.Item.GetAsync(u => u.Id == obj.Item.Id);
+            var collection = await _unitOfWork.Collection.GetAsync(u => u.Id == item.CollectionId);
+
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            if (User.IsInRole(SD.Role_User) && collection.ApplicationUserId != userId)
+            {
+                return StatusCode(403);
+            }
+
             foreach (var field in obj.CustomFields)
             {
                 string inputValue, textAreaValue, type;
@@ -90,7 +119,6 @@ namespace WebApplication1.Areas.User.Controllers
                 }
             }
 
-            var item = await _unitOfWork.Item.GetAsync(u => u.Id == obj.Item.Id);
             item.CustomFields = JsonConvert.SerializeObject(obj.CustomFields);
             item.Name = obj.Item.Name;
 
@@ -102,9 +130,19 @@ namespace WebApplication1.Areas.User.Controllers
             return RedirectToAction(nameof(Edit), new { ItemId = obj.Item.Id });
         }
 
+        [Authorize]
         public async Task<IActionResult> Delete(int itemId)
         {
             var item = await _unitOfWork.Item.GetAsync(u => u.Id == itemId);
+            var collection = await _unitOfWork.Collection.GetAsync(u => u.Id == item.CollectionId);
+
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            if (User.IsInRole(SD.Role_User) && collection.ApplicationUserId != userId)
+            {
+                return StatusCode(403);
+            }
 
             _unitOfWork.Item.Remove(item);
             _unitOfWork.Save();
@@ -113,13 +151,24 @@ namespace WebApplication1.Areas.User.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> AddTagAsync(ItemVM obj)
         {
+            var item = await _unitOfWork.Item.GetAsync(u => u.Id == obj.Item.Id, includeProperties: "ItemTags");
+            var collection = await _unitOfWork.Collection.GetAsync(u => u.Id == item.CollectionId);
+
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            if (User.IsInRole(SD.Role_User) && collection.ApplicationUserId != userId)
+            {
+                return StatusCode(403);
+            }
+
             var tagName = obj.TagName?.Trim();
             if (tagName != null)
             {
                 var tag = await _unitOfWork.Tag.GetAsync(u => u.Name == tagName);
-                var item = await _unitOfWork.Item.GetAsync(u => u.Id == obj.Item.Id, includeProperties: "ItemTags");
                 if (tag == null)
                 {
                     tag = new Tag
@@ -149,8 +198,20 @@ namespace WebApplication1.Areas.User.Controllers
             return RedirectToAction(nameof(Edit), new { ItemId = obj.Item.Id });
         }
 
+        [Authorize]
         public async Task<IActionResult> RemoveTagAsync(int tagId, int itemId)
         {
+            var item = await _unitOfWork.Item.GetAsync(u => u.Id == itemId);
+            var collection = await _unitOfWork.Collection.GetAsync(u => u.Id == item.CollectionId);
+
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            if (User.IsInRole(SD.Role_User) && collection.ApplicationUserId != userId)
+            {
+                return StatusCode(403);
+            }
+
             var itemTag = await _unitOfWork.ItemTag.GetAsync(u => u.ItemId == itemId && u.TagId == tagId);
             _unitOfWork.ItemTag.Remove(itemTag);
             _unitOfWork.Save();
@@ -162,10 +223,20 @@ namespace WebApplication1.Areas.User.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> AddFieldAsync(ItemVM obj)
         {
             var item = await _unitOfWork.Item.GetAsync(u => u.Id == obj.Item.Id);
-            
+            var collection = await _unitOfWork.Collection.GetAsync(u => u.Id == item.CollectionId);
+
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            if (User.IsInRole(SD.Role_User) && collection.ApplicationUserId != userId)
+            {
+                return StatusCode(403);
+            }
+
             var customFields = JsonConvert.DeserializeObject<Dictionary<string, object[]>>(item.CustomFields)!;
             if (customFields.ContainsKey(obj.FieldName))
             {
@@ -190,9 +261,19 @@ namespace WebApplication1.Areas.User.Controllers
             return RedirectToAction(nameof(Edit), new { ItemId = obj.Item.Id });
         }
 
+        [Authorize]
         public async Task<IActionResult> RemoveFieldAsync(string fieldKey, int itemId)
         {
             var item = await _unitOfWork.Item.GetAsync(u => u.Id == itemId);
+            var collection = await _unitOfWork.Collection.GetAsync(u => u.Id == item.CollectionId);
+
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            if (User.IsInRole(SD.Role_User) && collection.ApplicationUserId != userId)
+            {
+                return StatusCode(403);
+            }
 
             var customFields = JsonConvert.DeserializeObject<Dictionary<string, object[]>>(item.CustomFields)!;
             customFields.Remove(fieldKey);
@@ -208,8 +289,19 @@ namespace WebApplication1.Areas.User.Controllers
             return RedirectToAction(nameof(Edit), new { ItemId = itemId });
         }
 
+        [Authorize]
         public async Task<IActionResult> AddItemAsync(int collectionId)
         {
+            var collection = await _unitOfWork.Collection.GetAsync(u => u.Id == collectionId);
+
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            if (User.IsInRole(SD.Role_User) && collection.ApplicationUserId != userId)
+            {
+                return StatusCode(403);
+            }
+
             var item = new Item
             {
                 CollectionId = collectionId,

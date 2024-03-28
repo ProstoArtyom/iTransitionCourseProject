@@ -1,41 +1,70 @@
 ﻿@model CollectionVM
 
+@{
+    var claimsIdentity = (ClaimsIdentity)User.Identity;
+    var userId = claimsIdentity?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+}
+
 <form method="post" class="row">
     <input asp-for="Collection.Id" hidden />
     <div class="col-12 p-3">
-        <div class="col-12 col-lg-6 form-outline mb-3">
-            <label asp-for="Collection.Name" class="ms-2 text-muted"></label>
-            <input asp-for="Collection.Name" class="form-control" />
-            <span asp-validation-for="Collection.Name" class="text-danger"></span>
-        </div>
-        <div class="col-12 col-lg-8 form-outline mb-3">
-            <label asp-for="Collection.Description" class="ms-2 text-muted"></label>
-            <textarea asp-for="Collection.Description" class="form-control"></textarea>
-        </div>
-        <div class="col-12 col-lg-6 form-outline mb-3">
-            <label asp-for="Collection.ThemeId" class="ms-2 text-muted">Theme</label>
-            <select asp-for="Collection.ThemeId" asp-items="@Model.ThemesList" class="form-select">
-                <option disabled selected>--Select theme--</option>
-            </select>
-            <span asp-validation-for="Collection.ThemeId" class="text-danger"></span>
-        </div>
-        <button type="submit" class="btn btn-primary form-control" style="width:150px">
-            <i class="bi bi-floppy"></i> Save
-        </button>
-        <a onclick="DeleteCollection('@Url.Action("Delete", new { CollectionId = Model.Collection.Id })')" class="btn btn-danger" style="width:150px">
-            <i class="bi bi-trash3"></i> Delete
-        </a>
+        @if (Model.Collection.ApplicationUserId == userId || User.IsInRole(SD.Role_Admin))
+        {
+            <div class="col-12 col-lg-6 form-outline mb-3">
+                <label asp-for="Collection.Name" class="ms-2 text-muted"></label>
+                <input asp-for="Collection.Name" class="form-control" />
+                <span asp-validation-for="Collection.Name" class="text-danger"></span>
+            </div>
+            <div class="col-12 col-lg-8 form-outline mb-3">
+                <label asp-for="Collection.Description" class="ms-2 text-muted"></label>
+                <textarea asp-for="Collection.Description" class="form-control"></textarea>
+            </div>
+            <div class="col-12 col-lg-6 form-outline mb-3">
+                <label asp-for="Collection.ThemeId" class="ms-2 text-muted">Theme</label>
+                <select asp-for="Collection.ThemeId" asp-items="@Model.ThemesList" class="form-select">
+                    <option disabled selected>--Select theme--</option>
+                </select>
+                <span asp-validation-for="Collection.ThemeId" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-primary form-control" style="width:150px">
+                <i class="bi bi-floppy"></i> Save
+            </button>
+            <a onclick="DeleteCollection('@Url.Action("Delete", new { CollectionId = Model.Collection.Id })')" class="btn btn-danger" style="width:150px">
+                <i class="bi bi-trash3"></i> Delete
+            </a>
+        }
+        else
+        {
+            <div class="col-12 col-lg-6 form-outline mb-3">
+                <label asp-for="Collection.Name" class="ms-2 text-muted"></label>
+                <input asp-for="Collection.Name" class="form-control" disabled />
+            </div>
+            <div class="col-12 col-lg-8 form-outline mb-3">
+                <label asp-for="Collection.Description" class="ms-2 text-muted"></label>
+                <textarea asp-for="Collection.Description" class="form-control" disabled></textarea>
+            </div>
+            <div class="col-12 col-lg-6 form-outline mb-3">
+                <label asp-for="Collection.ThemeId" class="ms-2 text-muted">Theme</label>
+                <select asp-for="Collection.ThemeId" asp-items="@Model.ThemesList" class="form-select" disabled>
+                    <option disabled selected>--Select theme--</option>
+                </select>
+            </div>
+        }
+        }
     </div>
 </form>
 
 <hr/>
 
-<div class="text-end mb-2">
-    <a asp-controller="Item" asp-action="AddItem" asp-route-collectionId="@Model.Collection.Id"
-       class="btn btn-primary" style="width:150px">
-        <i class="bi bi-plus-circle"></i> Add Item
-    </a>
-</div>
+@if (Model.Collection.ApplicationUserId == userId || User.IsInRole(SD.Role_Admin))
+{
+    <div class="text-end mb-2">
+        <a asp-controller="Item" asp-action="AddItem" asp-route-collectionId="@Model.Collection.Id"
+            class="btn btn-primary" style="width:150px">
+            <i class="bi bi-plus-circle"></i> Add Item
+        </a>
+    </div>
+}
 
 <div class="text-center">
     <table id="tblCollection" class="table table-bordered table-striped table-hover" style="width:100%">
