@@ -7,6 +7,7 @@ using WebApplication1.Models.ViewModels;
 
 namespace WebApplication1.Areas.User.Controllers
 {
+    [Area("User")]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;

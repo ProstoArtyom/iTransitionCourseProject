@@ -5,6 +5,7 @@ using WebApplication1.Models.ViewModels;
 
 namespace WebApplication1.Areas.User.Controllers
 {
+    [Area("User")]
     public class SearchController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;

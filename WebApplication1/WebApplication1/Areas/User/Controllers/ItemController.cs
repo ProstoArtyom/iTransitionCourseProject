@@ -12,6 +12,7 @@ using System.Collections.Generic;
 
 namespace WebApplication1.Areas.User.Controllers
 {
+    [Area("User")]
     public class ItemController : Controller
     {
         [BindProperty]
