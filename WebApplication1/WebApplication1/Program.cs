@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using WebApplication1.DataAccess.Data;
 using WebApplication1.DataAccess.Repository.IRepository;
 using WebApplication1.DataAccess.Repository;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +15,11 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
 });
 
+builder.Services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
+
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+builder.Services.AddRazorPages();
 
 var app = builder.Build();
 
@@ -30,11 +35,12 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{area=User}/{controller=Home}/{action=Index}/{id?}");
+app.MapRazorPages();
 
 app.Run();

@@ -5,9 +5,11 @@ VisualStudioVersion = 17.8.34525.116
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApplication1", "WebApplication1\WebApplication1.csproj", "{6AFCA9D7-8A0B-499B-B254-D4B9979280A1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApplication1.DataAccess", "WebApplication1.DataAccess\WebApplication1.DataAccess.csproj", "{E3478021-6230-46F5-B04E-DCA5353EF671}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApplication1.DataAccess", "WebApplication1.DataAccess\WebApplication1.DataAccess.csproj", "{E3478021-6230-46F5-B04E-DCA5353EF671}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApplication1.Models", "WebApplication1.Models\WebApplication1.Models.csproj", "{5F41D24E-6CFC-48A9-BAA8-45E1F9B94A64}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApplication1.Models", "WebApplication1.Models\WebApplication1.Models.csproj", "{5F41D24E-6CFC-48A9-BAA8-45E1F9B94A64}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApplication1.Utility", "WebApplication1.Utility\WebApplication1.Utility.csproj", "{DF8AF8D9-BB24-412B-AED3-76799442F5BD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{5F41D24E-6CFC-48A9-BAA8-45E1F9B94A64}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5F41D24E-6CFC-48A9-BAA8-45E1F9B94A64}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5F41D24E-6CFC-48A9-BAA8-45E1F9B94A64}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DF8AF8D9-BB24-412B-AED3-76799442F5BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF8AF8D9-BB24-412B-AED3-76799442F5BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DF8AF8D9-BB24-412B-AED3-76799442F5BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF8AF8D9-BB24-412B-AED3-76799442F5BD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
