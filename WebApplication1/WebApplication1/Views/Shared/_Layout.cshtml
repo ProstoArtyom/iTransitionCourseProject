@@ -33,6 +33,14 @@
                         </li>
                     </ul>
                 </div>
+                <form id="formSearch" class="input-group mx-2" asp-area="" asp-controller="Search" asp-action="Index">
+                    <div class="input-group">
+                        <input id="searchBar" type="search" class="form-control py-3" placeholder="Enter search text" name="searchText">
+                        <button class="btn btn-secondary py-3" type="submit">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                </form>
             </div>
         </nav>
     </header>

@@ -78,7 +78,7 @@
         <tbody>
         @foreach (var tag in Model.Tags)
         {
-            <tr @* onclick="location.href = '@Url.Action("Index", "Collection", new { CollectionId = collection.Id })'" *@>
+                <tr onclick="location.href = '@Url.Action("SearchByTag", "Search", new { TagId = tag.Id })'">
                 <td>
                     @tag.Id
                 </td>

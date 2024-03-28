@@ -96,7 +96,7 @@ namespace WebApplication1.Areas.User.Controllers
 
             TempData["success"] = "The collection has been successfully created!";
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("List", "Collection");
         }
 
         public async Task<IActionResult> Delete(int collectionId)

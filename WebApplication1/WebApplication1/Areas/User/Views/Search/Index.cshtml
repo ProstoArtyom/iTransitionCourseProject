@@ -1,0 +1,47 @@
+﻿@model SearchVM
+
+@if (Model.Items?.Count() == 0)
+{
+    <h2 class="mb-4">Nothing was found!</h2>
+}
+else
+{
+    <h1 class="mb-4">Search Results:</h1>
+    <div class="text-center">
+        <h2 class="mb-4">Item List</h2>
+        <table id="tblItems" class="table table-bordered table-striped table-hover" style="width:100%">
+            <thead>
+                <tr>
+                    <th>№</th>
+                    <th>Name</th>
+                    <th>Tags</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Items)
+                {
+                    <tr onclick="location.href = '@Url.Action("Index", "Item", new { itemId = item.Id })'">
+                        <td>
+                            @item.Id
+                        </td>
+                        <td>
+                            @item.Name
+                        </td>
+                        <td>
+                            @($"{string.Join(", ", item.ItemTags.Take(3).Select(u => u.Tag.Name))}...")
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#tblCollection').DataTable();
+        });
+    </script>
+    <partial name="_ValidationScriptsPartial" />
+}
