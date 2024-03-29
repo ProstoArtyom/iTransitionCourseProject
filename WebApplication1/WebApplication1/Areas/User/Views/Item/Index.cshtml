@@ -72,6 +72,36 @@
     </div>
 </form>
 
+<hr />
+
+<form asp-action="AddComment" method="post" class="row">
+    <input asp-for="Item.Id" hidden />
+    <input asp-for="UserId" hidden />
+    <div class="col-12 p-3">
+        <div class="col-12 col-lg-6 form-outline mb-3">
+            <label class="ms-2 text-muted">Comment</label>
+            <input asp-for="CommentText" class="form-control" />
+            <span asp-validation-for="CommentText" class="text-danger"></span>
+        </div>
+        <button type="submit" class="btn btn-primary form-control" style="width:200px">
+            <i class="bi bi-send"></i> Send Comment
+        </button>
+    </div>
+</form>
+
+<hr />
+<h2 class="mb-4">Comments</h2>
+<div class="col-12 p-3">
+    @foreach (var comment in Model.Comments)
+    {
+        <div class="col-12 col-lg-6 form-outline mb-3">
+            <label class="ms-2 text-muted">@comment.ApplicationUser.Name</label>
+            <input asp-for="@comment.Text" class="form-control" disabled />
+        </div>
+        <hr />
+    }
+</div>
+
 @section Scripts
 {
     <script>

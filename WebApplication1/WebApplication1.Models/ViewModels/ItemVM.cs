@@ -13,6 +13,11 @@ namespace WebApplication1.Models.ViewModels
         public string TagName { get; set; }
         [Required]
         public string UserId { get; set; }
+        [Required]
+        [StringLength(200, MinimumLength = 5)]
+        public string CommentText { get; set; }
+        [ValidateNever]
+        public IEnumerable<Comment> Comments { get; set; }
         public Dictionary<string, string[]> CustomFields { get; set; }
         [Required]
         [MinLength(5)]

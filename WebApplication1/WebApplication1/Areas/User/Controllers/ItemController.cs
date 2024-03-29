@@ -39,11 +39,14 @@ namespace WebApplication1.Areas.User.Controllers
             item.ItemTags = itemTags.ToList();
             var customFields = JsonConvert.DeserializeObject<Dictionary<string, string[]>>(item.CustomFields);
 
+            var comments = await _unitOfWork.Comment.GetAllAsync(u => u.ItemId == itemId, includeProperties: "ApplicationUser");
+
             ItemVm = new()
             {
                 Item = item,
                 CustomFields = customFields,
-                UserId = collection.ApplicationUserId
+                UserId = collection.ApplicationUserId,
+                Comments = comments
             };
 
             return View(ItemVm);
@@ -316,6 +319,24 @@ namespace WebApplication1.Areas.User.Controllers
             TempData["success"] = "The item has been added successfully!";
 
             return RedirectToAction("Index", "Collection", new { CollectionId = collectionId });
+        }
+
+        [Authorize]
+        public IActionResult AddComment()
+        {
+            var comment = new Comment
+            {
+                Text = ItemVm.CommentText,
+                ApplicationUserId = ItemVm.UserId,
+                ItemId = ItemVm.Item.Id
+            };
+
+            _unitOfWork.Comment.AddAsync(comment);
+            _unitOfWork.Save();
+
+            TempData["success"] = "The comment has been added successfully!";
+
+            return RedirectToAction("Index", "Item", new { ItemId = ItemVm.Item.Id });
         }
     }
 }
