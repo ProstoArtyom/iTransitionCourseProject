@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using WebApplication1.Utility;
+using Duende.IdentityServer.Extensions;
 
 namespace WebApplication1.Areas.User.Controllers
 {
@@ -41,9 +42,16 @@ namespace WebApplication1.Areas.User.Controllers
 
             var comments = await _unitOfWork.Comment.GetAllAsync(u => u.ItemId == itemId, includeProperties: "ApplicationUser");
 
-            var claimsIdentity = (ClaimsIdentity)User.Identity;
-            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
-            var isLiked = await _unitOfWork.Like.GetAsync(u => u.ItemId == itemId && u.ApplicationUserId == userId) != null;
+            bool isLiked = false;
+            if (User.IsAuthenticated())
+            {
+                var claimsIdentity = (ClaimsIdentity)User.Identity;
+                var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+                isLiked = await _unitOfWork.Like.GetAsync(u => u.ItemId == itemId && u.ApplicationUserId == userId) != null;
+            }
+
+
             var likesCount = await _unitOfWork.Like.GetCountAsync(u => u.ItemId == itemId);
 
             ItemVm = new()
