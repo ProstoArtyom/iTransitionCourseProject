@@ -127,5 +127,15 @@ namespace WebApplication1.DataAccess.Repository
 
             return await query.ToListAsync();
         }
+
+        public async Task<int> GetCountAsync(Expression<Func<T, bool>>? filter)
+        {
+            IQueryable<T> query = dbSet.AsNoTracking();
+
+            if (filter != null)
+                query = query.Where(filter);
+
+            return await query.CountAsync();
+        }
     }
 }

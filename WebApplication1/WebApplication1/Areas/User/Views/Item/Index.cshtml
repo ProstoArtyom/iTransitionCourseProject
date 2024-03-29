@@ -74,6 +74,28 @@
 
 <hr />
 
+<form method="post" class="m-5">
+    <input asp-for="Item.Id" hidden />
+    <input asp-for="UserId" hidden />
+    <div class="d-flex align-items-center">
+        <h4 class="me-2">@Model.LikesCount</h4>
+        @if (Model.IsLiked)
+        {
+            <button asp-action="RemoveLike" type="submit" class="btn btn-outline-danger form-control" style="width:80px">
+                <i class="bi bi-hand-thumbs-up-fill"></i> Like
+            </button>
+        }
+        else
+        {
+            <button asp-action="AddLike" type="submit" class="btn btn-outline-primary form-control" style="width:80px">
+                <i class="bi bi-hand-thumbs-up"></i> Like
+            </button>
+        }
+    </div>
+</form>
+
+<hr />
+
 <form asp-action="AddComment" method="post" class="row">
     <input asp-for="Item.Id" hidden />
     <input asp-for="UserId" hidden />

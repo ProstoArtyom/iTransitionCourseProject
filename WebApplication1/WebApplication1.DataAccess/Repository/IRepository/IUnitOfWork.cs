@@ -9,6 +9,7 @@
         IItemTagRepository ItemTag { get; }
         IApplicationUserRepository ApplicationUser { get; }
         ICommentRepository Comment { get; }
+        ILikeRepository Like { get; }
         void Save();
     }
 }

@@ -13,6 +13,7 @@ namespace WebApplication1.DataAccess.Repository
         public IItemTagRepository ItemTag { get; }
         public IApplicationUserRepository ApplicationUser { get; }
         public ICommentRepository Comment { get; }
+        public ILikeRepository Like { get; }
         public UnitOfWork(ApplicationDbContext db)
         {
             _db = db;
@@ -23,6 +24,7 @@ namespace WebApplication1.DataAccess.Repository
             ItemTag = new ItemTagRepository(_db);
             ApplicationUser = new ApplicationUserRepository(_db);
             Comment = new CommentRepository(_db);
+            Like = new LikeRepository(_db);
         }
 
         public void Save()

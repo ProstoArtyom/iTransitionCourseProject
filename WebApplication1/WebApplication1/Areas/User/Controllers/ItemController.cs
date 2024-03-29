@@ -41,12 +41,19 @@ namespace WebApplication1.Areas.User.Controllers
 
             var comments = await _unitOfWork.Comment.GetAllAsync(u => u.ItemId == itemId, includeProperties: "ApplicationUser");
 
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var isLiked = await _unitOfWork.Like.GetAsync(u => u.ItemId == itemId && u.ApplicationUserId == userId) != null;
+            var likesCount = await _unitOfWork.Like.GetCountAsync(u => u.ItemId == itemId);
+
             ItemVm = new()
             {
                 Item = item,
                 CustomFields = customFields,
                 UserId = collection.ApplicationUserId,
-                Comments = comments
+                Comments = comments,
+                IsLiked = isLiked,
+                LikesCount = likesCount
             };
 
             return View(ItemVm);
@@ -335,6 +342,32 @@ namespace WebApplication1.Areas.User.Controllers
             _unitOfWork.Save();
 
             TempData["success"] = "The comment has been added successfully!";
+
+            return RedirectToAction("Index", "Item", new { ItemId = ItemVm.Item.Id });
+        }
+
+        [Authorize]
+        public IActionResult AddLike()
+        {
+            var like = new Like
+            {
+                ItemId = ItemVm.Item.Id,
+                ApplicationUserId= ItemVm.UserId
+            };
+
+            _unitOfWork.Like.AddAsync(like);
+            _unitOfWork.Save();
+
+            return RedirectToAction("Index", "Item", new { ItemId = ItemVm.Item.Id });
+        }
+
+        [Authorize]
+        public async Task<IActionResult> RemoveLikeAsync()
+        {
+            var like = await _unitOfWork.Like.GetAsync(u => u.ItemId == ItemVm.Item.Id
+                                                        && u.ApplicationUserId == ItemVm.UserId);
+            _unitOfWork.Like.Remove(like);
+            _unitOfWork.Save();
 
             return RedirectToAction("Index", "Item", new { ItemId = ItemVm.Item.Id });
         }

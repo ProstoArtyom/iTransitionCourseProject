@@ -18,5 +18,6 @@ namespace WebApplication1.DataAccess.Repository.IRepository
             bool tracked = false);
         Task<T> GetAsync(Expression<Func<T, bool>> filter, string? searchText = null, int? skipAmount = null, int? pageSize = null, string? includeProperties = null, bool tracked = false);
         void AddAsync(T entity);
+        Task<int> GetCountAsync(Expression<Func<T, bool>>? filter);
     }
 }

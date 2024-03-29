@@ -18,6 +18,10 @@ namespace WebApplication1.Models.ViewModels
         public string CommentText { get; set; }
         [ValidateNever]
         public IEnumerable<Comment> Comments { get; set; }
+        [Required]
+        public bool IsLiked { get; set; }
+        [Required]
+        public int LikesCount { get; set; }
         public Dictionary<string, string[]> CustomFields { get; set; }
         [Required]
         [MinLength(5)]
