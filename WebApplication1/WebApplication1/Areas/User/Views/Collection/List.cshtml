@@ -1,5 +1,6 @@
 ﻿<div class="text-center">
     <h2 class="mb-4">Collections List</h2>
+
     <div class="text-end mb-2">
         @if (User.Identity.IsAuthenticated)
         {
@@ -8,6 +9,9 @@
                 <i class="bi bi-plus-circle"></i> Add Item
             </a>
         }
+        <a asp-action="ExportCollectionsToCsv" class="btn btn-outline-primary">
+            Export to CSV
+        </a>
     </div>
     <table id="tblCollections" class="table table-bordered table-striped table-hover" style="width:100%">
         <thead>

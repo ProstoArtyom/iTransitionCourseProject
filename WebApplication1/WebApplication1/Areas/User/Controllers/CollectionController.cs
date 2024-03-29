@@ -2,10 +2,14 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Newtonsoft.Json;
+using System.Buffers;
 using System.Diagnostics;
+using System.Drawing.Printing;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using System.Security.Claims;
+using System.Text;
 using WebApplication1.DataAccess.Repository.IRepository;
 using WebApplication1.Models;
 using WebApplication1.Models.ViewModels;
@@ -163,9 +167,90 @@ namespace WebApplication1.Areas.User.Controllers
                     ordering: $"{sortColumn} {sortColumnDirection}",
                     includeProperties: "Theme");
 
+            CollectionVm.Collections = collections;
+
             var recordsTotal = collections.Count();
 
             return Json(new { Draw = draw, RecordsFiltered = recordsTotal, RecordsTotal = recordsTotal, Data = collections });
+        }
+
+        public async Task<IActionResult> ExportToCsv(int collectionId)
+        {
+            var collection = await _unitOfWork.Collection
+                .GetAsync(u => u.Id == collectionId, includeProperties: "Theme");
+
+            var items = await _unitOfWork.Item.GetAllAsync(x => x.CollectionId == collectionId);
+            foreach (var item in items)
+            {
+                var itemTags =
+                    await _unitOfWork.ItemTag.GetAllAsync(u => u.ItemId == item.Id, includeProperties: "Tag");
+                item.ItemTags = itemTags.ToList();
+            }
+
+            collection.Items = items;
+
+            var builder = new StringBuilder();
+            builder.AppendLine("Id,Name,Description,Theme");
+            builder.AppendLine($"{collection.Id},{collection.Name},{collection.Description},{collection.Theme.Name}\n");
+
+            if (collection.Items.Count() > 0)
+            {
+                builder.AppendLine("Id,Name,Tags");
+            }
+            foreach (var item in collection.Items)
+            {
+                var tags = string.Join(", ", item.ItemTags.Select(u => u.Tag.Name));
+                builder.AppendLine($"{item.Id},{item.Name},{tags}");
+            }
+
+            return File(Encoding.UTF8.GetBytes(builder.ToString()), "text/csv", "Collection.csv");
+        }
+
+        public async Task<IActionResult> ExportCollectionsToCsv()
+        {
+            Expression<Func<Collection, bool>> filter = u => true;
+            if (User.IsAuthenticated() && User.IsInRole(SD.Role_User))
+            {
+                var claimsIdentity = (ClaimsIdentity)User.Identity;
+                var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+                filter = u => u.ApplicationUserId == userId;
+            }
+
+            var collections = await _unitOfWork.Collection.GetAllAsync(filter, includeProperties: "Theme");
+            foreach (var collection in collections)
+            {
+                var items = await _unitOfWork.Item.GetAllAsync(x => x.CollectionId == collection.Id);
+                foreach (var item in items)
+                {
+                    var itemTags =
+                        await _unitOfWork.ItemTag.GetAllAsync(u => u.ItemId == item.Id, includeProperties: "Tag");
+                    item.ItemTags = itemTags.ToList();
+                }
+
+                collection.Items = items;
+            }
+
+            var builder = new StringBuilder();
+            foreach (var collection in collections)
+            {
+                builder.AppendLine("Id,Name,Description,Theme");
+                builder.AppendLine($"{collection.Id},{collection.Name},{collection.Description},{collection.Theme.Name}\n");
+
+                if (collection.Items.Count() > 0)
+                {
+                    builder.AppendLine("Id,Name,Tags");
+                }
+                foreach (var item in collection.Items)
+                {
+                    var tags = string.Join(", ", item.ItemTags.Select(u => u.Tag.Name));
+                    builder.AppendLine($"{item.Id},{item.Name},{tags}");
+                }
+                builder.AppendLine();
+                builder.AppendLine();
+            }
+
+            return File(Encoding.UTF8.GetBytes(builder.ToString()), "text/csv", "Collections.csv");
         }
     }
 }

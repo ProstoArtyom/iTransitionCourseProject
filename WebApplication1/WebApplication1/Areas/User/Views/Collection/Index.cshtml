@@ -53,6 +53,12 @@
     </div>
 </form>
 
+<div class="text-end">
+    <a asp-action="ExportToCsv" asp-route-collectionId="@Model.Collection.Id" class="btn btn-outline-primary">
+        Export to CSV
+    </a>
+</div>
+
 <hr/>
 
 @if (Model.Collection.ApplicationUserId == userId || User.IsInRole(SD.Role_Admin))
