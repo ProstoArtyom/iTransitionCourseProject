@@ -167,8 +167,6 @@ namespace WebApplication1.Areas.User.Controllers
                     ordering: $"{sortColumn} {sortColumnDirection}",
                     includeProperties: "Theme");
 
-            CollectionVm.Collections = collections;
-
             var recordsTotal = collections.Count();
 
             return Json(new { Draw = draw, RecordsFiltered = recordsTotal, RecordsTotal = recordsTotal, Data = collections });
