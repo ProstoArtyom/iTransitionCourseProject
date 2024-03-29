@@ -98,9 +98,9 @@ namespace WebApplication1.Areas.User.Controllers
 
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> Edit(ItemVM obj)
+        public async Task<IActionResult> Edit()
         {
-            var item = await _unitOfWork.Item.GetAsync(u => u.Id == obj.Item.Id);
+            var item = await _unitOfWork.Item.GetAsync(u => u.Id == ItemVm.Item.Id);
             var collection = await _unitOfWork.Collection.GetAsync(u => u.Id == item.CollectionId);
 
             var claimsIdentity = (ClaimsIdentity)User.Identity;
@@ -111,41 +111,45 @@ namespace WebApplication1.Areas.User.Controllers
                 return StatusCode(403);
             }
 
-            foreach (var field in obj.CustomFields)
+            if (ItemVm.CustomFields != null)
             {
-                string inputValue, textAreaValue, type;
-                if (field.Value.Length > 0)
+                foreach (var field in ItemVm.CustomFields)
                 {
-                    inputValue = field.Value[0];
-                    textAreaValue = field.Value[1];
-                    type = field.Value[2];
-
-                    obj.CustomFields[field.Key] = new[]
+                    string inputValue, textAreaValue, type;
+                    if (field.Value.Length > 0)
                     {
+                        inputValue = field.Value[0];
+                        textAreaValue = field.Value[1];
+                        type = field.Value[2];
+
+                        ItemVm.CustomFields[field.Key] = new[]
+                        {
                         type == "textarea"
                             ? textAreaValue
                             : inputValue,
                         type
                     };
-                }
-                else
-                {
-                    inputValue = "false";
-                    type = "checkbox";
+                    }
+                    else
+                    {
+                        inputValue = "false";
+                        type = "checkbox";
 
-                    obj.CustomFields[field.Key] = new[] { inputValue, type };
+                        ItemVm.CustomFields[field.Key] = new[] { inputValue, type };
+                    }
                 }
+
+                item.CustomFields = JsonConvert.SerializeObject(ItemVm.CustomFields);
             }
 
-            item.CustomFields = JsonConvert.SerializeObject(obj.CustomFields);
-            item.Name = obj.Item.Name;
+            item.Name = ItemVm.Item.Name;
 
             _unitOfWork.Item.Update(item);
             _unitOfWork.Save();
 
             TempData["success"] = "The item has been successfully updated";
 
-            return RedirectToAction(nameof(Edit), new { ItemId = obj.Item.Id });
+            return RedirectToAction(nameof(Edit), new { ItemId = ItemVm.Item.Id });
         }
 
         [Authorize]
