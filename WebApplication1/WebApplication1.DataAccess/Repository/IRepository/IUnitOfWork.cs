@@ -7,6 +7,7 @@
         ITagRepository Tag { get; }
         IThemeRepository Theme { get; }
         IItemTagRepository ItemTag { get; }
+        IApplicationUserRepository ApplicationUser { get; }
         void Save();
     }
 }

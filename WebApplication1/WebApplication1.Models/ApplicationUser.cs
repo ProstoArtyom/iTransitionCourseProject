@@ -10,4 +10,6 @@ public class ApplicationUser : IdentityUser
     public string Name { get; set; }
     [NotMapped]
     public string Role { get; set; }
+    [NotMapped]
+    public bool IsBlocked { get; set; }
 }

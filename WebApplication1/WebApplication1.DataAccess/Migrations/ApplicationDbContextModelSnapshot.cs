@@ -339,16 +339,21 @@ namespace WebApplication1.DataAccess.Migrations
                         new
                         {
                             Id = 1,
-                            Name = "Books"
+                            Name = "Other"
                         },
                         new
                         {
                             Id = 2,
-                            Name = "Signs"
+                            Name = "Books"
                         },
                         new
                         {
                             Id = 3,
+                            Name = "Signs"
+                        },
+                        new
+                        {
+                            Id = 4,
                             Name = "Silverware"
                         });
                 });

@@ -41,7 +41,7 @@
             </div>
             <div class="col-12 col-lg-8 form-outline mb-3">
                 <label asp-for="Collection.Description" class="ms-2 text-muted"></label>
-                <textarea asp-for="Collection.Description" class="form-control" disabled></textarea>
+                <textarea asp-for="Collection.Description" class="form-control" readonly></textarea>
             </div>
             <div class="col-12 col-lg-6 form-outline mb-3">
                 <label asp-for="Collection.ThemeId" class="ms-2 text-muted">Theme</label>
@@ -49,7 +49,6 @@
                     <option disabled selected>--Select theme--</option>
                 </select>
             </div>
-        }
         }
     </div>
 </form>
@@ -98,8 +97,8 @@
     <script>
         tinymce.init({
             selector: 'textarea',
-            plugins: 'anchor autolink charmap codesample emoticons  lists   table visualblocks wordcount',
-            toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough |  align lineheight | numlist bullist indent outdent',
+            plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount linkchecker markdown',
+            toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat',
         });
     </script>
     <script>

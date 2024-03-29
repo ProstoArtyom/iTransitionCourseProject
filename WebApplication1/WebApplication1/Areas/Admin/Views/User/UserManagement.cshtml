@@ -1,0 +1,52 @@
+﻿@model UserVM
+
+@if (Model.ApplicationUser.IsBlocked)
+{
+    <a asp-action="LockUnlock" asp-route-userId="@Model.ApplicationUser.Id" class="btn btn-primary" style="width:150px">
+        <i class="bi bi-unlock"></i> Unlock
+    </a>
+}
+else
+{
+    <a asp-action="LockUnlock" asp-route-userId="@Model.ApplicationUser.Id" class="btn btn-danger" style="width:150px">
+        <i class="bi bi-lock-fill"></i> Lock
+    </a>
+}
+
+<form method="post" class="row">
+    <input asp-for="ApplicationUser.Id" hidden />
+    <div class="col-12 p-3">
+        <div class="col-12 col-lg-6 form-outline mb-3">
+            <label asp-for="ApplicationUser.Id" class="ms-2 text-muted"></label>
+            <input asp-for="ApplicationUser.Id" class="form-control" disabled/>
+        </div>
+        <div class="col-12 col-lg-6 form-outline mb-3">
+            <label asp-for="ApplicationUser.UserName" class="ms-2 text-muted">User Name</label>
+            <input asp-for="ApplicationUser.UserName" class="form-control" />
+            <span asp-validation-for="ApplicationUser.UserName" class="text-danger"></span>
+        </div>
+        <div class="col-12 col-lg-6 form-outline mb-3">
+            <label asp-for="ApplicationUser.Name" class="ms-2 text-muted"></label>
+            <input asp-for="ApplicationUser.Name" class="form-control" />
+            <span asp-validation-for="ApplicationUser.Name" class="text-danger"></span>
+        </div>
+        <div class="col-12 col-lg-6 form-outline mb-3">
+            <label asp-for="ApplicationUser.Email" class="ms-2 text-muted"></label>
+            <input asp-for="ApplicationUser.Email" class="form-control" />
+            <span asp-validation-for="ApplicationUser.Email" class="text-danger"></span>
+        </div>
+        <div class="col-12 col-lg-6 form-outline mb-3">
+            <label asp-for="RoleList" class="ms-2 text-muted">Role List</label>
+            <select asp-for="ApplicationUser.Role" asp-items="@Model.RoleList" class="form-select">
+                <option disabled selected>--Select role--</option>
+            </select>
+            <span asp-validation-for="ApplicationUser.Role" class="text-danger"></span>
+        </div>
+        <button type="submit" class="btn btn-primary form-control" style="width:150px">
+            <i class="bi bi-floppy"></i> Save
+        </button>
+        <a asp-action="Delete" asp-route-userId="@Model.ApplicationUser.Id" class="btn btn-danger" style="width:150px">
+            <i class="bi bi-trash3"></i> Delete
+        </a>
+    </div>
+</form>

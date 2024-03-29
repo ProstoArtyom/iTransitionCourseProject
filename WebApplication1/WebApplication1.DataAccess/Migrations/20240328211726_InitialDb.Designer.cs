@@ -12,8 +12,8 @@ using WebApplication1.DataAccess.Data;
 namespace WebApplication1.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240328184839_AddDelimiter")]
-    partial class AddDelimiter
+    [Migration("20240328211726_InitialDb")]
+    partial class InitialDb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -238,6 +238,10 @@ namespace WebApplication1.DataAccess.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("ApplicationUserId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -251,18 +255,11 @@ namespace WebApplication1.DataAccess.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ApplicationUserId");
+
                     b.HasIndex("ThemeId");
 
                     b.ToTable("Collections");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Description = "It's a description for collection №1",
-                            Name = "Collection №1",
-                            ThemeId = 2
-                        });
                 });
 
             modelBuilder.Entity("WebApplication1.Models.Item", b =>
@@ -290,15 +287,6 @@ namespace WebApplication1.DataAccess.Migrations
                     b.HasIndex("CollectionId");
 
                     b.ToTable("Items");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CollectionId = 1,
-                            CustomFields = "{\"Book\":\"Librarian of Basra\",\"Author\":\"Jeanette Winter\",\"Published\":\"1939-12-04\"}",
-                            Name = "Book 1"
-                        });
                 });
 
             modelBuilder.Entity("WebApplication1.Models.ItemTag", b =>
@@ -332,13 +320,6 @@ namespace WebApplication1.DataAccess.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Tags");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "Cool_Collection"
-                        });
                 });
 
             modelBuilder.Entity("WebApplication1.Models.Theme", b =>
@@ -361,16 +342,21 @@ namespace WebApplication1.DataAccess.Migrations
                         new
                         {
                             Id = 1,
-                            Name = "Books"
+                            Name = "Other"
                         },
                         new
                         {
                             Id = 2,
-                            Name = "Signs"
+                            Name = "Books"
                         },
                         new
                         {
                             Id = 3,
+                            Name = "Signs"
+                        },
+                        new
+                        {
+                            Id = 4,
                             Name = "Silverware"
                         });
                 });
@@ -439,11 +425,19 @@ namespace WebApplication1.DataAccess.Migrations
 
             modelBuilder.Entity("WebApplication1.Models.Collection", b =>
                 {
+                    b.HasOne("WebApplication1.Models.ApplicationUser", "ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("WebApplication1.Models.Theme", "Theme")
                         .WithMany()
                         .HasForeignKey("ThemeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("ApplicationUser");
 
                     b.Navigation("Theme");
                 });

@@ -82,21 +82,7 @@ namespace WebApplication1.Areas.User.Controllers
             _unitOfWork.Collection.Update(collectionFromDb);
             _unitOfWork.Save();
 
-            collectionFromDb.Items = await _unitOfWork.Item.GetAllAsync(u => u.CollectionId == collectionFromDb.Id);
-
-            var themesList = await _unitOfWork.Theme.GetAllAsync();
-
-            CollectionVm = new CollectionVM
-            {
-                Collection = collectionFromDb,
-                ThemesList = themesList.Select(u => new SelectListItem
-                {
-                    Text = u.Name,
-                    Value = u.Id.ToString()
-                })
-            };
-
-            return View(CollectionVm);
+            return RedirectToAction(nameof(Index), new { CollectionId = collectionFromDb.Id });
         }
 
         [Authorize]
