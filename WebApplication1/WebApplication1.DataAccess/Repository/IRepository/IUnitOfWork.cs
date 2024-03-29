@@ -8,6 +8,7 @@
         IThemeRepository Theme { get; }
         IItemTagRepository ItemTag { get; }
         IApplicationUserRepository ApplicationUser { get; }
+        ICommentRepository Comment { get; }
         void Save();
     }
 }

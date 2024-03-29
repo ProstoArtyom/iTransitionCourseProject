@@ -16,6 +16,7 @@ namespace WebApplication1.DataAccess.Data
         public DbSet<Theme> Themes { get; set; }
         public DbSet<ItemTag> ItemTags { get; set; }
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
+        public DbSet<Comment> Comments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
