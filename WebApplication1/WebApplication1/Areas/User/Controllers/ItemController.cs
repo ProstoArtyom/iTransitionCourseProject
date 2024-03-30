@@ -38,7 +38,12 @@ namespace WebApplication1.Areas.User.Controllers
             var itemTags =
                 await _unitOfWork.ItemTag.GetAllAsync(u => u.ItemId == itemId, includeProperties: "Tag");
             item.ItemTags = itemTags.ToList();
-            var customFields = JsonConvert.DeserializeObject<Dictionary<string, string[]>>(item.CustomFields);
+
+            Dictionary<string, string[]> customFields;
+            if (item.CustomFields != null)
+                customFields = JsonConvert.DeserializeObject<Dictionary<string, string[]>>(item.CustomFields);
+            else
+                customFields = new Dictionary<string, string[]>();
 
             var comments = await _unitOfWork.Comment.GetAllAsync(u => u.ItemId == itemId, includeProperties: "ApplicationUser");
 
@@ -84,7 +89,8 @@ namespace WebApplication1.Areas.User.Controllers
             {
                 Item = new Item
                 {
-                    CollectionId = collectionId
+                    CollectionId = collectionId,
+                    CustomFields = JsonConvert.SerializeObject(new Dictionary<string, string[]>())
                 },
                 UserId = collection.ApplicationUserId
             };
@@ -123,7 +129,12 @@ namespace WebApplication1.Areas.User.Controllers
             var itemTags =
                 await _unitOfWork.ItemTag.GetAllAsync(u => u.ItemId == itemId, includeProperties: "Tag");
             item.ItemTags = itemTags.ToList();
-            var customFields = JsonConvert.DeserializeObject<Dictionary<string, string[]>>(item.CustomFields);
+
+            Dictionary<string, string[]> customFields;
+            if (item.CustomFields != null)
+                customFields = JsonConvert.DeserializeObject<Dictionary<string, string[]>>(item.CustomFields);
+            else
+                customFields = new Dictionary<string, string[]>();
 
             ItemVm = new()
             {
