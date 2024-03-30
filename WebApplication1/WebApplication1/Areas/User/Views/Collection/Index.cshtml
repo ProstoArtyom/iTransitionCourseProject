@@ -30,12 +30,18 @@
         }
         @if (Model.Collection.ApplicationUserId == userId || User.IsInRole(SD.Role_Admin))
         {
-            <a asp-action="Upsert" asp-route-collectionId="@Model.Collection.Id" class="btn btn-primary">
-                <i class="bi bi-pencil-square"></i> Edit
-            </a>
-            <a onclick="DeleteCollection('@Url.Action("Delete", new { CollectionId = Model.Collection.Id })')" class="btn btn-danger">
-                <i class="bi bi-trash3"></i> Delete
-            </a>
+             <div class="row pt-2">
+                <div class="col-6 col-md-3">
+                    <a asp-action="Upsert" asp-route-collectionId="@Model.Collection.Id" class="btn btn-primary form-control">
+                        <i class="bi bi-pencil-square"></i> Edit
+                    </a>
+                </div>
+                <div class="col-6 col-md-3">
+                    <a onclick="DeleteCollection('@Url.Action("Delete", new { CollectionId = Model.Collection.Id })')" class="btn btn-danger form-control">
+                        <i class="bi bi-trash3"></i> Delete
+                    </a>
+                </div>
+            </div>
         }
     </div>
 </form>
@@ -51,7 +57,7 @@
 @if (Model.Collection.ApplicationUserId == userId || User.IsInRole(SD.Role_Admin))
 {
     <div class="text-end mb-2">
-        <a asp-controller="Item" asp-action="AddItem" asp-route-collectionId="@Model.Collection.Id"
+        <a asp-controller="Item" asp-action="Create" asp-route-collectionId="@Model.Collection.Id"
             class="btn btn-primary" style="width:150px">
             <i class="bi bi-plus-circle"></i> Add Item
         </a>

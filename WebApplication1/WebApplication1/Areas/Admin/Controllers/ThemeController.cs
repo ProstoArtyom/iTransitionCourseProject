@@ -42,7 +42,7 @@ namespace WebApplication1.Areas.Admin.Controllers
         {
             if (theme.Id == 0)
             {
-                _unitOfWork.Theme.Add(theme);
+                _unitOfWork.Theme.AddAsync(theme);
                 TempData["success"] = $"The {theme.Name} has been added successfully!";
             }
             else

@@ -13,9 +13,8 @@ namespace WebApplication1.Models
         [Required]
         [MaxLength(20)]
         public string Name { get; set; }
-        [Required]
         [Column(TypeName = "json")]
-        public string CustomFields { get; set; }
+        public string? CustomFields { get; set; }
         [Required]
         public int CollectionId { get; set; }
         [ValidateNever]

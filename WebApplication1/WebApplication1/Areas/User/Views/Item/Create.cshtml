@@ -1,0 +1,27 @@
+﻿@model ItemVM
+
+<a asp-action="Index" asp-route-itemId="@Model.Item.Id" class="btn btn-outline-primary form-control" style="width:200px">
+    <i class="bi bi-arrow-return-left"></i> Back to Item Page
+</a>
+
+<hr />
+
+<form method="post" class="row enctype="multipart/form-data">
+    <input asp-for="Item.Id" hidden />
+    <input asp-for="Item.CollectionId" hidden />
+    <div class="col-12 p-3">
+        <div class="col-12 col-lg-6 form-outline mb-3">
+            <label asp-for="Item.Name" class="ms-2 text-muted"></label>
+            <input asp-for="Item.Name" class="form-control" />
+            <span asp-validation-for="Item.Name" class="text-danger"></span>
+        </div>
+        <button type="submit" class="btn btn-primary form-control" style="width:150px">
+            <i class="bi bi-floppy"></i> Save
+        </button>
+    </div>
+</form>
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+}

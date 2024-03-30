@@ -48,9 +48,9 @@ namespace WebApplication1.Areas.User.Controllers
                 var claimsIdentity = (ClaimsIdentity)User.Identity;
                 var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
 
-                isLiked = await _unitOfWork.Like.GetAsync(u => u.ItemId == itemId && u.ApplicationUserId == userId) != null;
+                var like = await _unitOfWork.Like.GetAsync(u => u.ItemId == itemId && u.ApplicationUserId == userId);
+                isLiked = like != null;
             }
-
 
             var likesCount = await _unitOfWork.Like.GetCountAsync(u => u.ItemId == itemId);
 
@@ -65,6 +65,45 @@ namespace WebApplication1.Areas.User.Controllers
             };
 
             return View(ItemVm);
+        }
+
+        [Authorize]
+        public async Task<IActionResult> Create(int collectionId)
+        {
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            var collection = await _unitOfWork.Collection.GetAsync(u => u.Id == collectionId);
+
+            if (User.IsInRole(SD.Role_User) && collection.ApplicationUserId != userId)
+            {
+                return StatusCode(403);
+            }
+
+            ItemVm = new()
+            {
+                Item = new Item
+                {
+                    CollectionId = collectionId
+                },
+                UserId = collection.ApplicationUserId
+            };
+
+            return View(ItemVm);
+        }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> Create()
+        {
+            var item = ItemVm.Item;
+
+            _unitOfWork.Item.AddAsync(item);
+            _unitOfWork.Save();
+
+            TempData["success"] = "The item has been successfully added!";
+
+            return RedirectToAction("Index", "Collection", new { CollectionId = item.CollectionId });
         }
 
         [Authorize]
@@ -124,11 +163,11 @@ namespace WebApplication1.Areas.User.Controllers
 
                         ItemVm.CustomFields[field.Key] = new[]
                         {
-                        type == "textarea"
-                            ? textAreaValue
-                            : inputValue,
-                        type
-                    };
+                            type == "textarea"
+                                ? textAreaValue
+                                : inputValue,
+                            type
+                        };
                     }
                     else
                     {
@@ -312,35 +351,6 @@ namespace WebApplication1.Areas.User.Controllers
         }
 
         [Authorize]
-        public async Task<IActionResult> AddItemAsync(int collectionId)
-        {
-            var collection = await _unitOfWork.Collection.GetAsync(u => u.Id == collectionId);
-
-            var claimsIdentity = (ClaimsIdentity)User.Identity;
-            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
-
-            if (User.IsInRole(SD.Role_User) && collection.ApplicationUserId != userId)
-            {
-                return StatusCode(403);
-            }
-
-            var item = new Item
-            {
-                CollectionId = collectionId,
-                Name = "",
-                ItemTags = new List<ItemTag>(),
-                CustomFields = "{}"
-            };
-
-            _unitOfWork.Item.Add(item);
-            _unitOfWork.Save();
-
-            TempData["success"] = "The item has been added successfully!";
-
-            return RedirectToAction("Index", "Collection", new { CollectionId = collectionId });
-        }
-
-        [Authorize]
         public IActionResult AddComment()
         {
             var comment = new Comment
@@ -361,10 +371,13 @@ namespace WebApplication1.Areas.User.Controllers
         [Authorize]
         public IActionResult AddLike()
         {
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+
             var like = new Like
             {
                 ItemId = ItemVm.Item.Id,
-                ApplicationUserId= ItemVm.UserId
+                ApplicationUserId = userId
             };
 
             _unitOfWork.Like.AddAsync(like);
@@ -374,10 +387,13 @@ namespace WebApplication1.Areas.User.Controllers
         }
 
         [Authorize]
-        public async Task<IActionResult> RemoveLikeAsync()
+        public async Task<IActionResult> RemoveLike()
         {
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+
             var like = await _unitOfWork.Like.GetAsync(u => u.ItemId == ItemVm.Item.Id
-                                                        && u.ApplicationUserId == ItemVm.UserId);
+                                                        && u.ApplicationUserId == userId);
             _unitOfWork.Like.Remove(like);
             _unitOfWork.Save();
 
