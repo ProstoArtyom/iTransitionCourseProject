@@ -1,0 +1,74 @@
+﻿@model CollectionVM
+
+<form method="post" class="row" enctype="multipart/form-data">
+    <input asp-for="Collection.Id" hidden />
+    <input asp-for="Collection.ApplicationUserId" hidden />
+    <div class="col-12 p-3">
+        <div class="col-12 col-lg-6 form-outline mb-3">
+            <label asp-for="Collection.Name" class="ms-2 text-muted"></label>
+            <input asp-for="Collection.Name" class="form-control" />
+            <span asp-validation-for="Collection.Name" class="text-danger"></span>
+        </div>
+        <div class="col-12 col-lg-8 form-outline mb-3">
+            <label asp-for="Collection.Description" class="ms-2 text-muted"></label>
+            <textarea asp-for="Collection.Description" class="form-control"></textarea>
+            <span asp-validation-for="Collection.Description" class="text-danger"></span>
+        </div>
+        <div class="col-12 col-lg-6 form-outline mb-3">
+            <label asp-for="Collection.ThemeId" class="ms-2 text-muted">Theme</label>
+            <select asp-for="Collection.ThemeId" asp-items="@Model.ThemesList" class="form-select">
+                <option disabled selected>--Select theme--</option>
+            </select>
+            <span asp-validation-for="Collection.ThemeId" class="text-danger"></span>
+        </div>
+        @if (!string.IsNullOrEmpty(Model.Collection.ImageUrl))
+        {
+            <div class="row">
+                <label class="ms-2 text-muted">Image</label>
+                <img src="@Url.Content(Model.Collection.ImageUrl)" alt="Image" style="width: auto; height: 220px;" />
+                <div class="col-1 col-lg-1 form-outline mt-4 mb-3">
+                    <a asp-action="DeleteImage" class="btn btn-danger"
+                       asp-route-collectionId="@Model.Collection.Id">
+                        <i class="bi bi-x-lg"></i>
+                    </a>
+                </div>
+            </div>
+        }
+        <div class="col-12 col-lg-6 form-outline mb-3">
+            <input asp-for="Collection.ImageUrl" class="form-control" hidden />
+        </div>
+        <div class="col-12 col-lg-6 form-outline mb-3">
+            <label asp-for="Collection.ImageFile" class="ms-2 text-muted"></label>
+            <input asp-for="Collection.ImageFile" type="file" class="form-control" />
+            <span asp-validation-for="Collection.ImageFile" class="text-danger"></span>
+        </div>
+        <div class="col-12 col-lg-6 form-outline mb-3">
+            <input asp-for="Collection.ImageStorageName" class="form-control" type="hidden" />
+        </div>
+        <div class="text-inline">
+            @if (Model.Collection.Id == 0)
+            {
+                <button type="submit" class="btn btn-primary">
+                    Create
+                </button>
+            }
+            else
+            {
+                <button type="submit" class="btn btn-primary">
+                    Save
+                </button>
+            }
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <script>
+        tinymce.init({
+            selector: 'textarea',
+            plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount linkchecker markdown',
+            toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat',
+        });
+    </script>
+    <partial name="_ValidationScriptsPartial" />
+}

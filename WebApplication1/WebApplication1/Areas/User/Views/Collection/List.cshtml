@@ -4,7 +4,7 @@
     <div class="text-end mb-2">
         @if (User.Identity.IsAuthenticated)
         {
-            <a asp-action="AddSync" asp-controller="Collection"
+            <a asp-action="Upsert" asp-controller="Collection"
                class="btn btn-primary" style="width:150px">
                 <i class="bi bi-plus-circle"></i> Add Item
             </a>

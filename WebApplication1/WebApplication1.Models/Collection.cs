@@ -12,8 +12,7 @@ namespace WebApplication1.Models
         public int Id { get; set; }
         [Required]
         public string Name { get; set; }
-        [Required]
-        public string Description { get; set; }
+        public string? Description { get; set; }
         public int ThemeId { get; set; }
         [ValidateNever]
         [ForeignKey(nameof(ThemeId))]
@@ -26,12 +25,12 @@ namespace WebApplication1.Models
         public IEnumerable<Item> Items { get; set; }
         [DataType(DataType.ImageUrl)]
         [Display(Name = "Poster")]
-        public string ImageUrl { get; set; }
+        public string? ImageUrl { get; set; }
         [Display(Name = "Image File")]
         [MaxFileSize(1 * 1024 * 1024)]
         [PermittedExtensions(new string[] { ".jpg", ".png", ".gif", ".jpeg" })]
         [NotMapped]
         public virtual IFormFile? ImageFile { get; set; }
-        public string ImageStorageName { get; set; }
+        public string? ImageStorageName { get; set; }
     }
 }

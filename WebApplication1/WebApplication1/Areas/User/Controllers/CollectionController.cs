@@ -67,70 +67,82 @@ namespace WebApplication1.Areas.User.Controllers
             return View(CollectionVm);
         }
 
-        [HttpPost]
         [Authorize]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Upsert(int? collectionId)
         {
-            var collection = CollectionVm.Collection;
-            var collectionFromDb = await _unitOfWork.Collection.GetAsync(u => u.Id == collection.Id);
-
-            if (User.IsInRole(SD.Role_User))
+            Collection collection;
+            if (collectionId == null)
             {
                 var claimsIdentity = (ClaimsIdentity)User.Identity;
                 var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
-
-                if (collectionFromDb.ApplicationUserId != userId)
+                collection = new Collection
                 {
-                    return StatusCode(403);
+                    ApplicationUserId = userId
+                };
+            }
+            else
+            {
+                collection = await _unitOfWork.Collection.GetAsync(u => u.Id == collectionId);
+                if (User.IsInRole(SD.Role_User))
+                {
+                    var claimsIdentity = (ClaimsIdentity)User.Identity;
+                    var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+                    if (collection.ApplicationUserId != userId)
+                    {
+                        return StatusCode(403);
+                    }
                 }
             }
 
-            collectionFromDb.Name = collection.Name;
-            collectionFromDb.Description = collection.Description;
-            collectionFromDb.ThemeId = collection.ThemeId;
+            var themes = await _unitOfWork.Theme.GetAllAsync();
+
+            CollectionVm = new CollectionVM
+            {
+                Collection = collection,
+                ThemesList = themes.Select(u => new SelectListItem
+                {
+                    Text = u.Name,
+                    Value = u.Id.ToString()
+                })
+            };
+
+            return View(CollectionVm);
+        }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> Upsert()
+        {
+            var collection = CollectionVm.Collection;
 
             if (collection.ImageFile != null)
             {
-                collectionFromDb.ImageFile = collection.ImageFile;
-
                 if (collection.ImageStorageName != null)
                 {
                     await _cloudStorage.DeleteFileAsync(collection.ImageStorageName);
                 }
 
-                await UploadFile(collectionFromDb);
+                await UploadFile(collection);
             }
 
-            _unitOfWork.Collection.Update(collectionFromDb);
-            _unitOfWork.Save();
-
-            return RedirectToAction(nameof(Index), new { CollectionId = collectionFromDb.Id });
-        }
-
-        [Authorize]
-        public async Task<IActionResult> AddSync()
-        {
-            var claimsIdentity = (ClaimsIdentity)User.Identity;
-            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
-
-            var theme = await _unitOfWork.Theme.GetAsync(u => u.Name == "Other");
-            var collection = new Collection
+            if (collection.Id == 0)
             {
-                Name = "",
-                Description = "",
-                Items = new List<Item>(),
-                ThemeId = theme.Id,
-                ApplicationUserId = userId
-            };
-            _unitOfWork.Collection.AddAsync(collection);
+                _unitOfWork.Collection.Add(collection);
+                TempData["success"] = "The collection has been successfully added!";
+            }
+            else
+            {
+                _unitOfWork.Collection.Update(collection);
+                TempData["success"] = "The collection has been successfully updated!";
+            }
             _unitOfWork.Save();
 
-            TempData["success"] = "The collection has been successfully created!";
-
-            return RedirectToAction("List", "Collection");
+            return RedirectToAction(nameof(Index), new { CollectionId = collection.Id });
         }
 
         [Authorize]
+        [HttpDelete]
         public async Task<IActionResult> Delete(int collectionId)
         {
             var collection = await _unitOfWork.Collection.GetAsync(u => u.Id == collectionId);
@@ -143,7 +155,7 @@ namespace WebApplication1.Areas.User.Controllers
                 return StatusCode(403);
             }
 
-            if (collection.ImageStorageName != null)
+            if (!string.IsNullOrEmpty(collection.ImageStorageName))
             {
                 await _cloudStorage.DeleteFileAsync(collection.ImageStorageName);
             }
@@ -151,7 +163,7 @@ namespace WebApplication1.Areas.User.Controllers
             _unitOfWork.Collection.Remove(collection);
             _unitOfWork.Save();
 
-            return Json(new { success = true, message = "The collection has been successfully deleted!" });
+            return Json(new { success = true, message = "The collection has been successfully deleted!", collectionId = collectionId });
         }
 
         public async Task<IActionResult> List()
@@ -307,7 +319,7 @@ namespace WebApplication1.Areas.User.Controllers
                 }
             }
 
-            return RedirectToAction(nameof(Index), new { CollectionId = collectionId });
+            return RedirectToAction(nameof(Upsert), new { CollectionId = collectionId });
         }
     }
 }
