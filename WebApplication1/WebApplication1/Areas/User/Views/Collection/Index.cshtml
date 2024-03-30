@@ -5,7 +5,7 @@
     var userId = claimsIdentity?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 }
 
-<form method="post" class="row">
+<form method="post" class="row" enctype="multipart/form-data">
     <input asp-for="Collection.Id" hidden />
     <div class="col-12 p-3">
         @if (Model.Collection.ApplicationUserId == userId || User.IsInRole(SD.Role_Admin))
@@ -26,6 +26,30 @@
                 </select>
                 <span asp-validation-for="Collection.ThemeId" class="text-danger"></span>
             </div>
+            @if (!string.IsNullOrEmpty(Model.Collection.ImageUrl))
+            {
+                <div class="row">
+                    <label class="ms-2 text-muted">Image</label>
+                    <img src="@Url.Content(Model.Collection.ImageUrl)" alt="Image" style="width: 150px; height: 220px;" />
+                    <div class="col-1 col-lg-1 form-outline mt-4 mb-3">
+                        <a asp-action="DeleteImage" class="btn btn-danger"
+                           asp-route-collectionId="@Model.Collection.Id">
+                            <i class="bi bi-x-lg"></i>
+                        </a>
+                    </div>
+                </div>
+            }
+            <div class="col-12 col-lg-6 form-outline mb-3">
+                <input asp-for="Collection.ImageUrl" class="form-control" hidden />
+            </div>
+            <div class="col-12 col-lg-6 form-outline mb-3">
+                <label asp-for="Collection.ImageFile" class="ms-2 text-muted"></label>
+                <input asp-for="Collection.ImageFile" type="file" class="form-control" />
+                <span asp-validation-for="Collection.ImageFile" class="text-danger"></span>
+            </div>
+            <div class="col-12 col-lg-6 form-outline mb-3">
+                <input asp-for="Collection.ImageStorageName" class="form-control" type="hidden" />
+            </div>
             <button type="submit" class="btn btn-primary form-control" style="width:150px">
                 <i class="bi bi-floppy"></i> Save
             </button>
@@ -36,7 +60,6 @@
         else
         {
             <div class="col-12 col-lg-6 form-outline mb-3">
-                <label asp-for="Collection.Name" class="ms-2 text-muted"></label>
                 <input asp-for="Collection.Name" class="form-control" disabled />
             </div>
             <div class="col-12 col-lg-8 form-outline mb-3">
@@ -49,6 +72,13 @@
                     <option disabled selected>--Select theme--</option>
                 </select>
             </div>
+            @if (!string.IsNullOrEmpty(Model.Collection.ImageUrl))
+            {
+                <div class="col-12 col-lg-6 form-outline mb-3">
+                    <label class="ms-2 text-muted">Image</label>
+                        <img src="@Url.Content(Model.Collection.ImageUrl)" alt="Image" style="width: 150px; height: 220px;" />
+                </div>
+            }
         }
     </div>
 </form>

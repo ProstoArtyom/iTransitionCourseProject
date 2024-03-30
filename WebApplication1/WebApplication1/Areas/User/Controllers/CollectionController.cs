@@ -1,7 +1,9 @@
-﻿using Duende.IdentityServer.Extensions;
+﻿using AspNetCoreWebApp.CloudStorage;
+using Duende.IdentityServer.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.Buffers;
 using System.Diagnostics;
@@ -25,11 +27,14 @@ namespace WebApplication1.Areas.User.Controllers
 
         private readonly ILogger<CollectionController> _logger;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ICloudStorage _cloudStorage;
         public CollectionController(ILogger<CollectionController> logger,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork,
+            ICloudStorage cloudStorage)
         {
             _logger = logger;
             _unitOfWork = unitOfWork;
+            _cloudStorage = cloudStorage;
         }
 
         public async Task<IActionResult> Index(int collectionId)
@@ -66,7 +71,8 @@ namespace WebApplication1.Areas.User.Controllers
         [Authorize]
         public async Task<IActionResult> Index()
         {
-            var collectionFromDb = await _unitOfWork.Collection.GetAsync(u => u.Id == CollectionVm.Collection.Id);
+            var collection = CollectionVm.Collection;
+            var collectionFromDb = await _unitOfWork.Collection.GetAsync(u => u.Id == collection.Id);
 
             if (User.IsInRole(SD.Role_User))
             {
@@ -79,9 +85,21 @@ namespace WebApplication1.Areas.User.Controllers
                 }
             }
 
-            collectionFromDb.Name = CollectionVm.Collection.Name;
-            collectionFromDb.Description = CollectionVm.Collection.Description;
-            collectionFromDb.ThemeId = CollectionVm.Collection.ThemeId;
+            collectionFromDb.Name = collection.Name;
+            collectionFromDb.Description = collection.Description;
+            collectionFromDb.ThemeId = collection.ThemeId;
+
+            if (collection.ImageFile != null)
+            {
+                collectionFromDb.ImageFile = collection.ImageFile;
+
+                if (collection.ImageStorageName != null)
+                {
+                    await _cloudStorage.DeleteFileAsync(collection.ImageStorageName);
+                }
+
+                await UploadFile(collectionFromDb);
+            }
 
             _unitOfWork.Collection.Update(collectionFromDb);
             _unitOfWork.Save();
@@ -249,6 +267,44 @@ namespace WebApplication1.Areas.User.Controllers
             }
 
             return File(Encoding.UTF8.GetBytes(builder.ToString()), "text/csv", "Collections.csv");
+        }
+
+        private async Task UploadFile(Collection collection)
+        {
+            string fileNameForStorage = FormFileName(collection.Name, collection.ImageFile.FileName);
+            collection.ImageUrl = await _cloudStorage.UploadFileAsync(collection.ImageFile, fileNameForStorage);
+            collection.ImageStorageName = fileNameForStorage;
+        }
+
+        private static string FormFileName(string title, string fileName)
+        {
+            var fileExtension = Path.GetExtension(fileName);
+            var fileNameForStorage = $"{title.Replace(' ', '_')}-{DateTime.Now.ToString("yyyyMMddHHmmss")}{fileExtension}";
+            return fileNameForStorage;
+        }
+
+        [Authorize]
+        public async Task<IActionResult> DeleteImageAsync(int collectionId)
+        {
+            var collection = await _unitOfWork.Collection.GetAsync(u => u.Id == collectionId);
+
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+            if (collection.ApplicationUserId == userId || User.IsInRole(SD.Role_Admin))
+            {
+                if (collection.ImageStorageName != null)
+                {
+                    await _cloudStorage.DeleteFileAsync(collection.ImageStorageName);
+
+                    collection.ImageStorageName = "";
+                    collection.ImageUrl = "";
+
+                    _unitOfWork.Collection.Update(collection);
+                    _unitOfWork.Save();
+                }
+            }
+
+            return RedirectToAction(nameof(Index), new { CollectionId = collectionId });
         }
     }
 }
