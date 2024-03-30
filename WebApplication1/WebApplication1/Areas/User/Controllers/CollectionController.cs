@@ -138,17 +138,20 @@ namespace WebApplication1.Areas.User.Controllers
             var claimsIdentity = (ClaimsIdentity)User.Identity;
             var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
 
-            if (collection.ApplicationUserId != userId)
+            if (collection.ApplicationUserId != userId && !User.IsInRole(SD.Role_Admin))
             {
                 return StatusCode(403);
+            }
+
+            if (collection.ImageStorageName != null)
+            {
+                await _cloudStorage.DeleteFileAsync(collection.ImageStorageName);
             }
 
             _unitOfWork.Collection.Remove(collection);
             _unitOfWork.Save();
 
-            TempData["success"] = "The collection has been successfully deleted!";
-
-            return RedirectToAction("Index", "Home");
+            return Json(new { success = true, message = "The collection has been successfully deleted!" });
         }
 
         public async Task<IActionResult> List()

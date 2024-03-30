@@ -30,7 +30,7 @@
             {
                 <div class="row">
                     <label class="ms-2 text-muted">Image</label>
-                    <img src="@Url.Content(Model.Collection.ImageUrl)" alt="Image" style="width: 150px; height: 220px;" />
+                    <img src="@Url.Content(Model.Collection.ImageUrl)" alt="Image" style="width: auto; height: 220px;" />
                     <div class="col-1 col-lg-1 form-outline mt-4 mb-3">
                         <a asp-action="DeleteImage" class="btn btn-danger"
                            asp-route-collectionId="@Model.Collection.Id">
@@ -138,11 +138,6 @@
         });
     </script>
     <script>
-        $(document).ready(function () {
-            $('#tblCollection').DataTable();
-        });
-    </script>
-    <script>
         function DeleteCollection(url) {
             Swal.fire({
                 title: "Are you sure?",
@@ -158,12 +153,17 @@
                         type: 'DELETE',
                         success: function (data) {
                             window.location.href = '/User/Home/Index';
-                            toastr.success('The collection has been successfully deleted!');
+                            toastr.success(data.message);
                         }
                     })
                 }
             });
         }
+    </script>
+    <script>
+        $(document).ready(function () {
+            $('#tblCollection').DataTable();
+        });
     </script>
     <partial name="_ValidationScriptsPartial"/>
 }

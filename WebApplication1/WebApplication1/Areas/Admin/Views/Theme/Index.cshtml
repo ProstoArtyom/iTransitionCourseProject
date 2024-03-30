@@ -1,0 +1,75 @@
+﻿@model IEnumerable<Theme>
+
+<div class="text-center">
+    <h2 class="mb-4">Theme List</h2>
+    <div class="text-end mb-2">
+        <a asp-action="Upsert" class="btn btn-primary" style="width:150px">
+            <i class="bi bi-plus-circle"></i> Add Item
+        </a>
+    </div>
+    <table id="tblThemes" class="table table-bordered table-striped table-hover" style="width:100%">
+        <thead>
+            <tr>
+                <th>№</th>
+                <th>Name</th>
+                <th style="width: 20%"></th>
+            </tr>
+        </thead>
+    </table>
+</div>
+
+@section Scripts {
+    <script>
+        var dataTable;
+
+        $(document).ready(function () {
+            loadDataTable();
+        });
+
+        function loadDataTable() {
+            dataTable = $('#tblThemes').DataTable({
+                "ajax": { url: '/admin/theme/getall' },
+                "columns": [
+                    { data: 'id', "width": "20%" },
+                    { data: 'name', "width": "60%" },
+                    {
+                        data: 'id',
+                        "render": function (data)
+                        {
+                            if (data != 1) {
+                                return `<div class="text-inline">
+                                        <a href="/admin/theme/upsert?themeId=${data}" class="btn btn-primary mx-2"> <i class="bi bi-pencil-square"></i> Edit </a>
+                                        <a onClick="Delete('/admin/theme/delete/${data}')" class="btn btn-danger mx-2"> <i class="bi bi-trash-fill"></i> Delete </a>
+                                    </div>`
+                            }
+                            return ``;
+                        },
+                        "width": "20%"
+                    }
+                ]
+            });
+        }
+
+        function Delete(url) {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: url,
+                        type: 'DELETE',
+                        success: function (data) {
+                            dataTable.ajax.reload();
+                            toastr.success(data.message);
+                        }
+                    })
+                }
+            });
+        }
+    </script>
+}

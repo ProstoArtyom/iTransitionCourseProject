@@ -31,7 +31,7 @@ namespace WebApplication1.Models
         [MaxFileSize(1 * 1024 * 1024)]
         [PermittedExtensions(new string[] { ".jpg", ".png", ".gif", ".jpeg" })]
         [NotMapped]
-        public virtual IFormFile ImageFile { get; set; }
+        public virtual IFormFile? ImageFile { get; set; }
         public string ImageStorageName { get; set; }
     }
 }
