@@ -307,7 +307,16 @@ namespace WebApplication1.Areas.User.Controllers
                 return StatusCode(403);
             }
 
-            var customFields = JsonConvert.DeserializeObject<Dictionary<string, object[]>>(item.CustomFields)!;
+            Dictionary<string, object[]> customFields;
+            if (item.CustomFields != null)
+            {
+                customFields = JsonConvert.DeserializeObject<Dictionary<string, object[]>>(item.CustomFields);
+            }
+            else
+            {
+                customFields = new Dictionary<string, object[]>();
+            }
+
             if (customFields.ContainsKey(obj.FieldName))
             {
                 TempData["error"] = $"Field with {obj.FieldName} name already exists!";
