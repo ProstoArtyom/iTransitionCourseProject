@@ -74,19 +74,22 @@
         </tr>
         </thead>
         <tbody>
-        @foreach (var item in Model.Collection.Items)
-        {
-            <tr onclick="location.href = '@Url.Action("Index", "Item", new { itemId = item.Id })'">
-                <td>
-                    @item.Id
-                </td>
-                <td>
-                    @item.Name
-                </td>
-                <td>
-                    @($"{string.Join(", ", item.ItemTags.Take(3).Select(u => u.Tag.Name))}...")
-                </td>
-            </tr>
+        @{
+            var index = 0;
+            foreach (var item in Model.Collection.Items)
+            {
+                <tr onclick="location.href = '@Url.Action("Index", "Item", new { itemId = item.Id })'">
+                    <td>
+                        @(++index)
+                    </td>
+                    <td>
+                        @item.Name
+                    </td>
+                    <td>
+                        @($"{string.Join(", ", item.ItemTags.Take(3).Select(u => u.Tag.Name))}...")
+                    </td>
+                </tr>
+            }
         }
         </tbody>
     </table>

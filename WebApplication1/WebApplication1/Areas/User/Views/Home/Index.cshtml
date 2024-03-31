@@ -11,19 +11,22 @@
         </tr>
         </thead>
         <tbody>
-        @foreach (var item in Model.Items)
-        {
-            <tr onclick="location.href = '@Url.Action("Index", "Item", new { ItemId = item.Id })'">
-                <td>
-                    @item.Id
-                </td>
-                <td>
-                    @item.Name
-                </td>
-                <td>
-                    @($"{string.Join(", ", item.ItemTags.Take(3).Select(u => u.Tag.Name))}...")
-                </td>
-            </tr>
+        @{
+            var index = 0;
+            foreach (var item in Model.Items)
+            {
+                <tr onclick="location.href = '@Url.Action("Index", "Item", new { ItemId = item.Id })'">
+                    <td>
+                        @(++index)
+                    </td>
+                    <td>
+                        @item.Name
+                    </td>
+                    <td>
+                        @($"{string.Join(", ", item.ItemTags.Take(3).Select(u => u.Tag.Name))}...")
+                    </td>
+                </tr>
+            }
         }
         </tbody>
     </table>
@@ -43,22 +46,25 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var collection in Model.Collections)
-            {
-                <tr onclick="location.href = '@Url.Action("Index", "Collection", new { CollectionId = collection.Id })'">
-                    <td>
-                        @collection.Id
-                    </td>
-                    <td>
-                        @collection.Name
-                    </td>
-                    <td>
-                        @Html.Raw(@collection.Description)
-                    </td>
-                    <td>
-                        @collection.Theme.Name
-                    </td>
-                </tr>
+            @{
+                index = 0;
+                foreach (var collection in Model.Collections)
+                {
+                    <tr onclick="location.href = '@Url.Action("Index", "Collection", new { CollectionId = collection.Id })'">
+                        <td>
+                            @(++index)
+                        </td>
+                        <td>
+                            @collection.Name
+                        </td>
+                        <td>
+                            @Html.Raw(@collection.Description)
+                        </td>
+                        <td>
+                            @collection.Theme.Name
+                        </td>
+                    </tr>
+                }
             }
         </tbody>
     </table>
@@ -76,16 +82,19 @@
         </tr>
         </thead>
         <tbody>
-        @foreach (var tag in Model.Tags)
-        {
-                <tr onclick="location.href = '@Url.Action("SearchByTag", "Search", new { TagId = tag.Id })'">
-                <td>
-                    @tag.Id
-                </td>
-                <td>
-                    @tag.Name
-                </td>
-            </tr>
+        @{
+            index = 0;
+            foreach (var tag in Model.Tags)
+            {
+                    <tr onclick="location.href = '@Url.Action("SearchByTag", "Search", new { TagId = tag.Id })'">
+                    <td>
+                        @(++index)
+                    </td>
+                    <td>
+                        @tag.Name
+                    </td>
+                </tr>
+            }
         }
         </tbody>
     </table>
