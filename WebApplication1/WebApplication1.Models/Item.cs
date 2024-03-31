@@ -11,7 +11,6 @@ namespace WebApplication1.Models
         [Key]
         public int Id { get; set; }
         [Required]
-        [MaxLength(20)]
         public string Name { get; set; }
         [Column(TypeName = "json")]
         public string? CustomFields { get; set; }
