@@ -371,10 +371,13 @@ namespace WebApplication1.Areas.User.Controllers
         [Authorize]
         public IActionResult AddComment()
         {
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+
             var comment = new Comment
             {
                 Text = ItemVm.CommentText,
-                ApplicationUserId = ItemVm.UserId,
+                ApplicationUserId = userId,
                 ItemId = ItemVm.Item.Id
             };
 
