@@ -14,20 +14,16 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-light border-bottom box-shadow mb-3">
             <div class="container-fluid">
                 <a class="navbar-brand" asp-area="User" asp-controller="Home" asp-action="Index">WebApplication1</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+                <div class="d-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1 justify-content-between">
                         <li class="nav-item">
                             <a class="nav-link" asp-area="User" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" asp-area="User" asp-controller="Collection" asp-action="List">My Collections</a>
+                            <a class="nav-link" asp-area="User" asp-controller="Collection" asp-action="List">Collections</a>
                         </li>
                     </ul>
                 </div>
