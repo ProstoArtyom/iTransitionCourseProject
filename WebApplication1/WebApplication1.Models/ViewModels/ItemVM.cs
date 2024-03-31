@@ -23,10 +23,8 @@ namespace WebApplication1.Models.ViewModels
         public int LikesCount { get; set; }
         public Dictionary<string, string[]> CustomFields { get; set; }
         [Required]
-        [MaxLength(20)]
         public string FieldName { get; set; }
         [Required]
-        [MaxLength(20)]
         public string FieldValueInput { get; set; }
         [Required]
         public string FieldValueTextArea { get; set; }
