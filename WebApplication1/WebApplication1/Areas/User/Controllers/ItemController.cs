@@ -222,7 +222,6 @@ namespace WebApplication1.Areas.User.Controllers
             return RedirectToAction("Index", "Collection",new { collectionId = item.CollectionId });
         }
 
-        [HttpPost]
         [Authorize]
         public async Task<IActionResult> AddTagAsync(ItemVM obj)
         {
