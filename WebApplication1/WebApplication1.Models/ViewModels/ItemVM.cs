@@ -8,7 +8,6 @@ namespace WebApplication1.Models.ViewModels
     {
         public Item Item { get; set; }
         [Required]
-        [MinLength(5)]
         [MaxLength(20)]
         public string TagName { get; set; }
         [Required]
@@ -24,15 +23,12 @@ namespace WebApplication1.Models.ViewModels
         public int LikesCount { get; set; }
         public Dictionary<string, string[]> CustomFields { get; set; }
         [Required]
-        [MinLength(5)]
         [MaxLength(20)]
         public string FieldName { get; set; }
         [Required]
-        [MinLength(5)]
         [MaxLength(20)]
         public string FieldValueInput { get; set; }
         [Required]
-        [MinLength(5)]
         public string FieldValueTextArea { get; set; }
         public string FieldType { get; set; }
         public List<SelectListItem> TypesList { get; } = new()

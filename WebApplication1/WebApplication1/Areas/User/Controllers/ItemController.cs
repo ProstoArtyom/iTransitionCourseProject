@@ -294,7 +294,6 @@ namespace WebApplication1.Areas.User.Controllers
             return RedirectToAction(nameof(Edit), new { ItemId = itemId });
         }
 
-        [HttpPost]
         [Authorize]
         public async Task<IActionResult> AddFieldAsync(ItemVM obj)
         {
